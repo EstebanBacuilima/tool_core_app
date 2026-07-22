@@ -1,0 +1,6 @@
+# gen-l10n config. Spanish (app_es.arb) is the template; every new string
+# must be added to BOTH arb files. Widgets never hardcode text.
+arb-dir: lib/l10n
+template-arb-file: app_es.arb
+output-localization-file: app_localizations.dart
+nullable-getter: false
