@@ -19,10 +19,10 @@ List<HomeMenuItem> buildHomeMenuItems(AppLocalizations l10n) {
       label: l10n.menuServices,
       route: AppRoutes.services,
     ),
-    HomeMenuItem(icon: Icons.inventory_2_outlined, label: l10n.menuInventory),
     HomeMenuItem(
-      icon: Icons.settings_suggest_outlined,
-      label: l10n.menuSpareParts,
+      icon: Icons.inventory_2_outlined,
+      label: l10n.menuInventory,
+      route: AppRoutes.inventory,
     ),
     HomeMenuItem(icon: Icons.assignment_outlined, label: l10n.menuWorkOrders),
   ];

@@ -7,6 +7,12 @@ import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../features/auth/presentation/cubit/login_cubit.dart';
+import '../../features/inventory/data/datasources/inventory_remote_datasource.dart';
+import '../../features/inventory/data/repositories/inventory_repository_impl.dart';
+import '../../features/inventory/domain/repositories/inventory_repository.dart';
+import '../../features/inventory/presentation/cubit/inventory_cubit.dart';
+import '../../features/inventory/presentation/cubit/product_form_cubit.dart';
+import '../../features/inventory/presentation/cubit/stock_movement_cubit.dart';
 import '../../features/services/data/datasources/services_remote_datasource.dart';
 import '../../features/services/data/repositories/services_repository_impl.dart';
 import '../../features/services/domain/repositories/services_repository.dart';
@@ -52,4 +58,15 @@ Future<void> setupDependencies() async {
   );
   getIt.registerFactory<ServicesCubit>(() => ServicesCubit(getIt()));
   getIt.registerFactory<ServiceFormCubit>(() => ServiceFormCubit(getIt()));
+
+  // --- Feature: inventory ---
+  getIt.registerLazySingleton<InventoryRemoteDatasource>(
+    () => InventoryRemoteDatasource(getIt()),
+  );
+  getIt.registerLazySingleton<InventoryRepository>(
+    () => InventoryRepositoryImpl(getIt(), getIt()),
+  );
+  getIt.registerFactory<InventoryCubit>(() => InventoryCubit(getIt()));
+  getIt.registerFactory<ProductFormCubit>(() => ProductFormCubit(getIt()));
+  getIt.registerFactory<StockMovementCubit>(() => StockMovementCubit(getIt()));
 }
