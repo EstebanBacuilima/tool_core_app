@@ -52,5 +52,12 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<String?> getActiveCompany() => _storage.readActiveCompanyCode();
 
   @override
+  Future<void> setActiveWorkshop(String workshopCode) =>
+      _storage.writeActiveWorkshopCode(workshopCode);
+
+  @override
+  Future<String?> getActiveWorkshop() => _storage.readActiveWorkshopCode();
+
+  @override
   Future<void> logout() => _storage.clear();
 }

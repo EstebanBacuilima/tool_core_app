@@ -9,6 +9,14 @@ String localizeErrorCode(AppLocalizations l10n, String code) {
       return l10n.errorInvalidCredentials;
     case 'validation-error':
       return l10n.errorValidation;
+    case 'service-not-found':
+      return l10n.errorServiceNotFound;
+    case 'service-name-required':
+      return l10n.errorServiceNameRequired;
+    case 'service-price-invalid':
+      return l10n.errorServicePriceInvalid;
+    case ClientErrorCodes.workshopNotSelected:
+      return l10n.errorWorkshopNotSelected;
     case ClientErrorCodes.network:
       return l10n.errorNetwork;
     case ClientErrorCodes.tooManyRequests:

@@ -15,5 +15,6 @@ class ClientErrorCodes {
   static const String network = 'network-error';
   static const String tooManyRequests = 'too-many-requests';
   static const String sessionExpired = 'session-expired';
+  static const String workshopNotSelected = 'workshop-not-selected';
   static const String unexpected = 'unexpected-error';
 }

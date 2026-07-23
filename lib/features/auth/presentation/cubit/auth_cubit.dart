@@ -52,11 +52,26 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /// Set the active company.
+  /// Resolves the active company AND workshop (tenant context).
+  /// Keeps the stored ones if still valid, otherwise falls back to the
+  /// first membership. A picker screen can replace this later.
   Future<void> _resolveActiveCompany(UserProfile user) async {
-    if (user.companyCodes.isEmpty) return;
-    final current = await _repository.getActiveCompany();
-    if (current != null && user.companyCodes.contains(current)) return;
-    await _repository.setActiveCompany(user.companyCodes.first);
+    if (user.companies.isEmpty) return;
+
+    final currentCompany = await _repository.getActiveCompany();
+    final company = user.companies.firstWhere(
+      (c) => c.code == currentCompany,
+      orElse: () => user.companies.first,
+    );
+    await _repository.setActiveCompany(company.code);
+
+    // Services/inventory are per workshop: resolve one within the company.
+    if (company.workshops.isEmpty) return;
+    final currentWorkshop = await _repository.getActiveWorkshop();
+    final workshop = company.workshops.firstWhere(
+      (w) => w.code == currentWorkshop,
+      orElse: () => company.workshops.first,
+    );
+    await _repository.setActiveWorkshop(workshop.code);
   }
 }

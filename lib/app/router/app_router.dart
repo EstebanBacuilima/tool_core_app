@@ -8,6 +8,7 @@ import '../../features/auth/presentation/cubit/auth_state.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
+import '../../features/services/presentation/pages/services_page.dart';
 
 class AppRoutes {
   AppRoutes._();
@@ -15,6 +16,7 @@ class AppRoutes {
   static const String splash = '/splash';
   static const String login = '/login';
   static const String home = '/home';
+  static const String services = '/services';
 }
 
 /// Router with an auth guard driven by the [AuthCubit]:
@@ -55,6 +57,10 @@ GoRouter createRouter(AuthCubit authCubit) {
       GoRoute(
         path: AppRoutes.home,
         builder: (context, state) => const HomePage(),
+      ),
+      GoRoute(
+        path: AppRoutes.services,
+        builder: (context, state) => const ServicesPage(),
       ),
     ],
   );

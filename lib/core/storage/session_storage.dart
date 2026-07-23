@@ -19,6 +19,12 @@ class SessionStorage {
   Future<void> writeActiveCompanyCode(String code) =>
       _storage.write(key: StorageKeys.activeCompanyCode, value: code);
 
+  Future<String?> readActiveWorkshopCode() =>
+      _storage.read(key: StorageKeys.activeWorkshopCode);
+
+  Future<void> writeActiveWorkshopCode(String code) =>
+      _storage.write(key: StorageKeys.activeWorkshopCode, value: code);
+
   Future<String?> readThemeMode() =>
       _storage.read(key: StorageKeys.themeMode);
 
@@ -30,5 +36,6 @@ class SessionStorage {
   Future<void> clear() async {
     await _storage.delete(key: StorageKeys.token);
     await _storage.delete(key: StorageKeys.activeCompanyCode);
+    await _storage.delete(key: StorageKeys.activeWorkshopCode);
   }
 }

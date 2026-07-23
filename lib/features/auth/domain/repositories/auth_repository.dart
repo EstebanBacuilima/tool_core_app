@@ -16,6 +16,11 @@ abstract class AuthRepository {
 
   Future<String?> getActiveCompany();
 
+  /// Persists the active workshop code (services/inventory are per workshop).
+  Future<void> setActiveWorkshop(String workshopCode);
+
+  Future<String?> getActiveWorkshop();
+
   /// Clears token and company code from secure storage.
   Future<void> logout();
 }

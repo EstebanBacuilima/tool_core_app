@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'package:tool_core_app/l10n/app_localizations.dart';
+import '../../../../app/router/app_router.dart';
 
 class HomeMenuItem {
   final IconData icon;
@@ -14,7 +14,11 @@ class HomeMenuItem {
 /// Init menu list
 List<HomeMenuItem> buildHomeMenuItems(AppLocalizations l10n) {
   return [
-    HomeMenuItem(icon: Icons.handyman_outlined, label: l10n.menuServices),
+    HomeMenuItem(
+      icon: Icons.handyman_outlined,
+      label: l10n.menuServices,
+      route: AppRoutes.services,
+    ),
     HomeMenuItem(icon: Icons.inventory_2_outlined, label: l10n.menuInventory),
     HomeMenuItem(
       icon: Icons.settings_suggest_outlined,

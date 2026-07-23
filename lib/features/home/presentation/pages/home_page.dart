@@ -12,7 +12,8 @@ class HomePage extends StatelessWidget {
 
   void _onItemTap(BuildContext context, HomeMenuItem item) {
     if (item.route != null) {
-      context.go(item.route!);
+      // push (not go) so the user can navigate back to home.
+      context.push(item.route!);
       return;
     }
     ScaffoldMessenger.of(context)
