@@ -9,6 +9,58 @@ String localizeErrorCode(AppLocalizations l10n, String code) {
       return l10n.errorInvalidCredentials;
     case 'validation-error':
       return l10n.errorValidation;
+    case 'work-order-not-found':
+      return l10n.errorWorkOrderNotFound;
+    case 'work-order-status-not-found':
+      return l10n.errorWorkOrderStatusNotFound;
+    case 'work-order-transition-invalid':
+      return l10n.errorWorkOrderTransitionInvalid;
+    case 'work-order-locked':
+      return l10n.errorWorkOrderLocked;
+    case 'work-order-line-not-found':
+      return l10n.errorWorkOrderLineNotFound;
+    case 'work-order-vehicle-required':
+      return l10n.errorWorkOrderVehicleRequired;
+    case 'line-quantity-invalid':
+      return l10n.errorLineQuantityInvalid;
+    case 'line-price-invalid':
+      return l10n.errorLinePriceInvalid;
+    case 'line-hours-invalid':
+      return l10n.errorLineHoursInvalid;
+    case 'labor-description-required':
+      return l10n.errorLaborDescriptionRequired;
+    case 'discount-invalid':
+      return l10n.errorDiscountInvalid;
+    case 'mechanic-not-found':
+      return l10n.errorMechanicNotFound;
+    case 'payment-amount-invalid':
+      return l10n.errorPaymentAmountInvalid;
+    case 'payment-method-invalid':
+      return l10n.errorPaymentMethodInvalid;
+    case 'payment-exceeds-balance':
+      return l10n.errorPaymentExceedsBalance;
+    case 'document-type-required':
+      return l10n.errorDocumentTypeRequired;
+    case 'customer-not-found':
+      return l10n.errorCustomerNotFound;
+    case 'customer-first-name-required':
+      return l10n.errorCustomerFirstNameRequired;
+    case 'customer-required':
+      return l10n.errorCustomerRequired;
+    case 'vehicle-not-found':
+      return l10n.errorVehicleNotFound;
+    case 'vehicle-plate-required':
+      return l10n.errorVehiclePlateRequired;
+    case 'vehicle-plate-already-exists':
+      return l10n.errorVehiclePlateExists;
+    case 'vehicle-brand-required':
+      return l10n.errorVehicleBrandRequired;
+    case 'vehicle-model-required':
+      return l10n.errorVehicleModelRequired;
+    case 'vehicle-year-invalid':
+      return l10n.errorVehicleYearInvalid;
+    case 'vehicle-mileage-invalid':
+      return l10n.errorVehicleMileageInvalid;
     case 'product-not-found':
       return l10n.errorProductNotFound;
     case 'product-name-required':

@@ -240,19 +240,41 @@ class _ProductList extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: () => context.read<InventoryCubit>().load(),
-      child: ListView.separated(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 96),
-        itemCount: state.products.length,
-        separatorBuilder: (_, _) => const SizedBox(height: 10),
-        itemBuilder: (context, index) {
-          final product = state.products[index];
-          return _ProductTile(
-            product: product,
-            onTap: () => onEdit(product),
-            onMovement: () => onMovement(product),
-          );
+      // Infinite scroll: request the next page near the bottom.
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (notification) {
+          if (notification.metrics.pixels >=
+              notification.metrics.maxScrollExtent - 200) {
+            context.read<InventoryCubit>().loadMore();
+          }
+          return false;
         },
+        child: ListView.separated(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(16, 6, 16, 96),
+          itemCount: state.products.length + (state.loadingMore ? 1 : 0),
+          separatorBuilder: (_, _) => const SizedBox(height: 10),
+          itemBuilder: (context, index) {
+            if (index >= state.products.length) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2.5),
+                  ),
+                ),
+              );
+            }
+            final product = state.products[index];
+            return _ProductTile(
+              product: product,
+              onTap: () => onEdit(product),
+              onMovement: () => onMovement(product),
+            );
+          },
+        ),
       ),
     );
   }

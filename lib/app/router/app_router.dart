@@ -10,6 +10,9 @@ import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/inventory/presentation/pages/inventory_page.dart';
 import '../../features/services/presentation/pages/services_page.dart';
+import '../../features/work_orders/presentation/pages/create_work_order_page.dart';
+import '../../features/work_orders/presentation/pages/work_order_detail_page.dart';
+import '../../features/work_orders/presentation/pages/work_orders_page.dart';
 
 class AppRoutes {
   AppRoutes._();
@@ -19,6 +22,10 @@ class AppRoutes {
   static const String home = '/home';
   static const String services = '/services';
   static const String inventory = '/inventory';
+  static const String workOrders = '/work-orders';
+  static const String workOrderNew = '/work-orders/new';
+
+  static String workOrderDetail(String code) => '/work-orders/$code';
 }
 
 /// Router with an auth guard driven by the [AuthCubit]:
@@ -67,6 +74,19 @@ GoRouter createRouter(AuthCubit authCubit) {
       GoRoute(
         path: AppRoutes.inventory,
         builder: (context, state) => const InventoryPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.workOrders,
+        builder: (context, state) => const WorkOrdersPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.workOrderNew,
+        builder: (context, state) => const CreateWorkOrderPage(),
+      ),
+      GoRoute(
+        path: '/work-orders/:code',
+        builder: (context, state) =>
+            WorkOrderDetailPage(orderCode: state.pathParameters['code']!),
       ),
     ],
   );

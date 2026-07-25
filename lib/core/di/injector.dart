@@ -18,6 +18,15 @@ import '../../features/services/data/repositories/services_repository_impl.dart'
 import '../../features/services/domain/repositories/services_repository.dart';
 import '../../features/services/presentation/cubit/service_form_cubit.dart';
 import '../../features/services/presentation/cubit/services_cubit.dart';
+import '../../features/work_orders/data/datasources/customers_remote_datasource.dart';
+import '../../features/work_orders/data/datasources/work_orders_remote_datasource.dart';
+import '../../features/work_orders/data/repositories/customers_repository_impl.dart';
+import '../../features/work_orders/data/repositories/work_orders_repository_impl.dart';
+import '../../features/work_orders/domain/repositories/customers_repository.dart';
+import '../../features/work_orders/domain/repositories/work_orders_repository.dart';
+import '../../features/work_orders/presentation/cubit/create_order_cubit.dart';
+import '../../features/work_orders/presentation/cubit/order_detail_cubit.dart';
+import '../../features/work_orders/presentation/cubit/work_orders_cubit.dart';
 import '../network/dio_client.dart';
 import '../storage/session_storage.dart';
 import '../theme/theme_cubit.dart';
@@ -69,4 +78,31 @@ Future<void> setupDependencies() async {
   getIt.registerFactory<InventoryCubit>(() => InventoryCubit(getIt()));
   getIt.registerFactory<ProductFormCubit>(() => ProductFormCubit(getIt()));
   getIt.registerFactory<StockMovementCubit>(() => StockMovementCubit(getIt()));
+
+  // --- Feature: work orders ---
+  getIt.registerLazySingleton<WorkOrdersRemoteDatasource>(
+    () => WorkOrdersRemoteDatasource(getIt()),
+  );
+  getIt.registerLazySingleton<CustomersRemoteDatasource>(
+    () => CustomersRemoteDatasource(getIt()),
+  );
+  getIt.registerLazySingleton<WorkOrdersRepository>(
+    () => WorkOrdersRepositoryImpl(getIt(), getIt()),
+  );
+  getIt.registerLazySingleton<CustomersRepository>(
+    () => CustomersRepositoryImpl(getIt()),
+  );
+  getIt.registerFactory<WorkOrdersCubit>(() => WorkOrdersCubit(getIt()));
+  getIt.registerFactory<CreateOrderCubit>(
+    () => CreateOrderCubit(getIt(), getIt()),
+  );
+  // param1 = order code (one cubit per opened order).
+  getIt.registerFactoryParam<OrderDetailCubit, String, void>(
+    (orderCode, _) => OrderDetailCubit(
+      getIt(),
+      getIt(),
+      getIt(),
+      orderCode: orderCode,
+    ),
+  );
 }

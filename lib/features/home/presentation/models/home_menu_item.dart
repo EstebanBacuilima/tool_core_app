@@ -24,6 +24,10 @@ List<HomeMenuItem> buildHomeMenuItems(AppLocalizations l10n) {
       label: l10n.menuInventory,
       route: AppRoutes.inventory,
     ),
-    HomeMenuItem(icon: Icons.assignment_outlined, label: l10n.menuWorkOrders),
+    HomeMenuItem(
+      icon: Icons.assignment_outlined,
+      label: l10n.menuWorkOrders,
+      route: AppRoutes.workOrders,
+    ),
   ];
 }

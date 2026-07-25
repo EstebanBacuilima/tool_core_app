@@ -1,13 +1,13 @@
 import 'package:dio/dio.dart';
 
+import '../../../../core/models/api_paged_response.dart';
 import '../../../../core/models/api_response.dart';
 import '../dtos/product_category_dto.dart';
 import '../dtos/product_dto.dart';
 import '../dtos/product_save_dto.dart';
 import '../dtos/product_stock_dto.dart';
 
-/// Raw HTTP calls for the inventory feature (envelope-aware).
-/// Query params are kebab-case, as the backend expects.
+
 class InventoryRemoteDatasource {
   final Dio _dio;
 
@@ -26,26 +26,24 @@ class InventoryRemoteDatasource {
     return envelope.data ?? const [];
   }
 
-  Future<List<ProductDto>> getProducts(
+  Future<ApiPagedResponse<ProductDto>> getProducts(
     String workshopCode, {
     String? categoryCode,
     String? search,
+    int page = 1,
+    int pageSize = 20,
   }) async {
     final response = await _dio.get<Map<String, dynamic>>(
       '/workshops/$workshopCode/products',
       queryParameters: {
         'category-code': ?categoryCode,
         if (search != null && search.isNotEmpty) 'search': search,
+        'page': page,
+        'page-size': pageSize,
       },
     );
 
-    final envelope = ApiResponse.fromJson(
-      response.data!,
-      (json) => (json as List<dynamic>)
-          .map((e) => ProductDto.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-    return envelope.data ?? const [];
+    return ApiPagedResponse.fromJson(response.data!, ProductDto.fromJson);
   }
 
   Future<ProductDto> create(String workshopCode, ProductSaveDto dto) async {

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/errors/api_exception.dart';
 import '../../../../core/errors/error_mapper.dart';
+import '../../../../core/models/paged_result.dart';
 import '../../../../core/storage/session_storage.dart';
 import '../../domain/entities/movement_type.dart';
 import '../../domain/entities/product.dart';
@@ -37,17 +38,24 @@ class InventoryRepositoryImpl implements InventoryRepository {
   }
 
   @override
-  Future<List<Product>> getProducts({
+  Future<PagedResult<Product>> getProducts({
     String? categoryCode,
     String? search,
+    int page = 1,
   }) async {
     try {
-      final dtos = await _remote.getProducts(
+      final response = await _remote.getProducts(
         await _workshopCode(),
         categoryCode: categoryCode,
         search: search,
+        page: page,
       );
-      return dtos.map((d) => d.toEntity()).toList();
+      return PagedResult(
+        items: response.data.map((d) => d.toEntity()).toList(),
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        totalCount: response.totalCount,
+      );
     } on DioException catch (e) {
       throw ErrorMapper.fromDio(e);
     }

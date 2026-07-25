@@ -26,15 +26,43 @@ class InventoryLoaded extends InventoryState {
   final String? selectedCategoryCode;
   final String search;
 
+  /// Server pagination: more pages available / next page in flight.
+  final bool hasMore;
+  final bool loadingMore;
+
   const InventoryLoaded({
     required this.products,
     required this.categories,
     this.selectedCategoryCode,
     this.search = '',
+    this.hasMore = false,
+    this.loadingMore = false,
   });
 
+  InventoryLoaded copyWith({
+    List<Product>? products,
+    bool? hasMore,
+    bool? loadingMore,
+  }) {
+    return InventoryLoaded(
+      products: products ?? this.products,
+      categories: categories,
+      selectedCategoryCode: selectedCategoryCode,
+      search: search,
+      hasMore: hasMore ?? this.hasMore,
+      loadingMore: loadingMore ?? this.loadingMore,
+    );
+  }
+
   @override
-  List<Object?> get props => [products, categories, selectedCategoryCode, search];
+  List<Object?> get props => [
+    products,
+    categories,
+    selectedCategoryCode,
+    search,
+    hasMore,
+    loadingMore,
+  ];
 }
 
 class InventoryFailure extends InventoryState {

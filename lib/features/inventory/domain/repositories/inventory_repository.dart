@@ -1,3 +1,4 @@
+import '../../../../core/models/paged_result.dart';
 import '../entities/movement_type.dart';
 import '../entities/product.dart';
 import '../entities/product_category.dart';
@@ -10,8 +11,12 @@ abstract class InventoryRepository {
   /// `GET /product-categories` (tree).
   Future<List<ProductCategory>> getCategories();
 
-  /// `GET /workshops/{workshopCode}/products?category-code=&search=`
-  Future<List<Product>> getProducts({String? categoryCode, String? search});
+  /// `GET /workshops/{workshopCode}/products` — paginated
+  Future<PagedResult<Product>> getProducts({
+    String? categoryCode,
+    String? search,
+    int page = 1,
+  });
 
   /// `POST /workshops/{workshopCode}/products` (stock starts at 0).
   Future<Product> createProduct(ProductInput input);
