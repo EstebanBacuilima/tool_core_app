@@ -133,7 +133,7 @@ class _ServiceTile extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context);
-    final statusColor = service.isActive ? scheme.tertiary : scheme.error;
+    final statusColor = service.isActive ? Colors.lightGreen : scheme.error;
 
     return Card(
       elevation: 0,

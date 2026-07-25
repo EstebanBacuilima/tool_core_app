@@ -123,6 +123,17 @@ class BrandTheme extends Equatable {
         ),
         iconTheme: IconThemeData(color: appBarForeground),
       ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: scheme.surface,
+        foregroundColor: scheme.onSurface,
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: scheme.surface,
+        selectedColor: scheme.tertiary.withValues(alpha: 0.2),
+        labelStyle: TextStyle(color: scheme.onSurface),
+        iconTheme: IconThemeData(color: scheme.surface),
+        deleteIconColor: scheme.surface,
+      ),
     );
   }
 
