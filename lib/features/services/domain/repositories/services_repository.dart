@@ -14,5 +14,6 @@ abstract class ServicesRepository {
     required String name,
     required double price,
     String? description,
+    bool? isActive,
   });
 }

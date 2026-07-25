@@ -85,8 +85,7 @@ class _LoginViewState extends State<_LoginView> {
                     ),
                     child: Icon(
                       Icons.build_circle_outlined,
-                      size: 56,
-                      color: scheme.secondary,
+                      size: 56
                     ),
                   ),
                   const SizedBox(height: 16),

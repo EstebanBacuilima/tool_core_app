@@ -24,6 +24,8 @@
   "servicePrice": "Precio",
   "serviceDescription": "Descripción (opcional)",
   "serviceSaved": "Servicio guardado",
+  "serviceActivated": "Servicio activado",
+  "serviceDeactivated": "Servicio desactivado",
   "save": "Guardar",
   "retry": "Reintentar",
   "activeLabel": "Activo",

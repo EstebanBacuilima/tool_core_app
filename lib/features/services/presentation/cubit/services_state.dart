@@ -20,10 +20,25 @@ class ServicesLoading extends ServicesState {
 class ServicesLoaded extends ServicesState {
   final List<Service> services;
 
-  const ServicesLoaded(this.services);
+  final String? togglingCode;
+  final String? errorCode;
+
+  const ServicesLoaded(this.services, {this.togglingCode, this.errorCode});
+
+  ServicesLoaded copyWith({
+    List<Service>? services,
+    String? togglingCode,
+    String? errorCode,
+  }) {
+    return ServicesLoaded(
+      services ?? this.services,
+      togglingCode: togglingCode,
+      errorCode: errorCode,
+    );
+  }
 
   @override
-  List<Object?> get props => [services];
+  List<Object?> get props => [services, togglingCode, errorCode];
 }
 
 class ServicesFailure extends ServicesState {

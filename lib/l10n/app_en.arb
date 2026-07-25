@@ -24,6 +24,8 @@
   "servicePrice": "Price",
   "serviceDescription": "Description (optional)",
   "serviceSaved": "Service saved",
+  "serviceActivated": "Service activated",
+  "serviceDeactivated": "Service deactivated",
   "save": "Save",
   "retry": "Retry",
   "activeLabel": "Active",

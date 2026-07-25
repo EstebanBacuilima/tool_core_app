@@ -19,15 +19,14 @@ class HomeMenuCard extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context);
-    final tintColor = tint ?? scheme.primary;
     final available = item.route != null;
 
     return Card(
-      elevation: 0,
+      elevation: 0.5,
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.4)),
+        side: BorderSide(color: scheme.primary.withValues(alpha: 0.4)),
       ),
       child: InkWell(
         onTap: onTap,
@@ -39,10 +38,10 @@ class HomeMenuCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: tintColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(14),
+                  color: scheme.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(item.icon, size: 28, color: tintColor),
+                child: Icon(item.icon, size: 28, color: scheme.primary),
               ),
               const Spacer(),
               Text(

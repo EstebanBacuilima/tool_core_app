@@ -12,6 +12,7 @@ class ServicesRemoteDatasource {
   Future<List<ServiceDto>> getAllByWorkshop(String workshopCode) async {
     final response = await _dio.get<Map<String, dynamic>>(
       '/workshops/$workshopCode/services',
+      queryParameters: {'include-inactive': true},
     );
 
     final envelope = ApiResponse.fromJson(

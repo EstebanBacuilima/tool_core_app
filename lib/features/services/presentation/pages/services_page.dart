@@ -51,32 +51,63 @@ class _ServicesView extends StatelessWidget {
         icon: const Icon(Icons.add),
         label: Text(l10n.serviceNew),
       ),
-      body: BlocBuilder<ServicesCubit, ServicesState>(
+      body: BlocConsumer<ServicesCubit, ServicesState>(
+        listenWhen: (previous, current) =>
+            previous is ServicesLoaded &&
+            previous.togglingCode != null &&
+            current is ServicesLoaded &&
+            current.togglingCode == null,
+        listener: (context, state) {
+          final loaded = state as ServicesLoaded;
+          final String message;
+          if (loaded.errorCode != null) {
+            message = localizeErrorCode(l10n, loaded.errorCode!);
+          } else {
+            final toggled = context.read<ServicesCubit>().lastToggled;
+            message = toggled?.isActive ?? true
+                ? l10n.serviceActivated
+                : l10n.serviceDeactivated;
+          }
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(
+              SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text(message),
+              ),
+            );
+        },
         builder: (context, state) {
           return switch (state) {
-            ServicesInitial() ||
-            ServicesLoading() =>
-              const Center(child: CircularProgressIndicator()),
+            ServicesInitial() || ServicesLoading() => const Center(
+              child: CircularProgressIndicator(),
+            ),
             ServicesFailure(:final code) => _ErrorView(code: code),
-            ServicesLoaded(:final services) => services.isEmpty
-                ? const _EmptyView()
-                : RefreshIndicator(
-                    onRefresh: () => context.read<ServicesCubit>().load(),
-                    child: ListView.separated(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      // Bottom padding so the FAB never covers the last item.
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
-                      itemCount: services.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 10),
-                      itemBuilder: (context, index) {
-                        final service = services[index];
-                        return _ServiceTile(
-                          service: service,
-                          onTap: () => _openForm(context, service: service),
-                        );
-                      },
+            ServicesLoaded(:final services, :final togglingCode) =>
+              services.isEmpty
+                  ? const _EmptyView()
+                  : RefreshIndicator(
+                      onRefresh: () => context.read<ServicesCubit>().load(),
+                      child: ListView.separated(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+                        itemCount: services.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 10),
+                        itemBuilder: (context, index) {
+                          final service = services[index];
+                          return _ServiceTile(
+                            service: service,
+                            toggling: togglingCode == service.code,
+                            onToggle: togglingCode == null
+                                ? (value) => context
+                                      .read<ServicesCubit>()
+                                      .toggleActive(service, value)
+                                : null,
+                            onTap: () => _openForm(context, service: service),
+                          );
+                        },
+                      ),
                     ),
-                  ),
           };
         },
       ),
@@ -86,16 +117,22 @@ class _ServicesView extends StatelessWidget {
 
 class _ServiceTile extends StatelessWidget {
   final Service service;
+  final bool toggling;
+  final ValueChanged<bool>? onToggle;
   final VoidCallback onTap;
 
-  const _ServiceTile({required this.service, required this.onTap});
+  const _ServiceTile({
+    required this.service,
+    required this.toggling,
+    required this.onToggle,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context);
-    // Active/inactive chip colors, always derived from the scheme.
     final statusColor = service.isActive ? scheme.tertiary : scheme.error;
 
     return Card(
@@ -115,14 +152,10 @@ class _ServiceTile extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: scheme.secondary.withValues(alpha: 0.12),
+                  color: scheme.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(
-                  Icons.handyman_outlined,
-                  size: 24,
-                  color: scheme.secondary,
-                ),
+                child: Icon(Icons.handyman_outlined, size: 24),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -179,6 +212,22 @@ class _ServiceTile extends StatelessWidget {
                   ),
                 ],
               ),
+              const SizedBox(width: 8),
+              if (toggling)
+                const Padding(
+                  padding: EdgeInsets.all(14),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2.4),
+                  ),
+                )
+              else
+                Switch(
+                  value: service.isActive,
+                  onChanged: onToggle,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
             ],
           ),
         ),
@@ -208,8 +257,8 @@ class _EmptyView extends StatelessWidget {
           Text(
             l10n.servicesEmpty,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: scheme.onSurface.withValues(alpha: 0.6),
-                ),
+              color: scheme.onSurface.withValues(alpha: 0.6),
+            ),
           ),
         ],
       ),

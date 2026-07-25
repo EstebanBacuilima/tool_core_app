@@ -57,11 +57,17 @@ class ServicesRepositoryImpl implements ServicesRepository {
     required String name,
     required double price,
     String? description,
+    bool? isActive,
   }) async {
     try {
       final dto = await _remote.update(
         code,
-        ServiceSaveDto(name: name, price: price, description: description),
+        ServiceSaveDto(
+          name: name,
+          price: price,
+          description: description,
+          isActive: isActive,
+        ),
       );
       return dto.toEntity();
     } on DioException catch (e) {

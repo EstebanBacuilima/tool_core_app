@@ -28,11 +28,11 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: scheme.secondary,
+        color: scheme.primary,
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
-            color: scheme.primary.withValues(alpha: 0.2),
+            color: scheme.primary.withValues(alpha: 0.4),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

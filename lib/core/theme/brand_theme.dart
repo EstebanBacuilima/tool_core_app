@@ -19,11 +19,11 @@ class BrandTheme extends Equatable {
 
   /// App default palette, used until a company brand is loaded.
   static const BrandTheme fallback = BrandTheme(
-    primary: Color(0xFF1D2D44),
-    secondary: Color(0xFF3E5C76),
-    accent: Color(0xFF8AA9C4),
-    text: Color(0xFF3E5C76),
-    background: Color(0xFFEAF2F8),
+    primary: Color(0xFF0F4C81),
+    secondary: Color(0xFF2C3E50),
+    accent: Color(0xFF00A8CC),
+    text: Color(0xFF1C2833),
+    background: Color(0xFFFAFAFA),
   );
 
   ThemeData toThemeData(Brightness brightness) {
@@ -83,6 +83,17 @@ class BrandTheme extends Equatable {
         errorBorder: border(scheme.error),
         focusedErrorBorder: border(scheme.error),
         disabledBorder: border(scheme.outlineVariant.withValues(alpha: 0.5)),
+      ),
+      iconTheme: IconThemeData(color: scheme.secondary),
+      appBarTheme: AppBarTheme(
+        backgroundColor: scheme.primary,
+        centerTitle: true,
+        titleTextStyle: textTheme.titleLarge?.copyWith(
+          color: scheme.onPrimary,
+          fontSize: 20.0,
+          fontWeight: FontWeight.w600,
+        ),
+        iconTheme: IconThemeData(color: scheme.onPrimary),
       ),
     );
   }
