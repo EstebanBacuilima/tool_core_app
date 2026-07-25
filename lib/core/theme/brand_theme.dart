@@ -1,103 +1,134 @@
-import 'package:flutter/material.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class BrandTheme extends Equatable {
+class BrandPalette extends Equatable {
   final Color primary;
   final Color secondary;
   final Color accent;
   final Color text;
   final Color background;
+  final Color surface;
 
-  const BrandTheme({
+  const BrandPalette({
     required this.primary,
     required this.secondary,
     required this.accent,
     required this.text,
     required this.background,
+    required this.surface,
   });
 
-  /// App default palette, used until a company brand is loaded.
+  @override
+  List<Object?> get props => [
+    primary,
+    secondary,
+    accent,
+    text,
+    background,
+    surface,
+  ];
+}
+
+class BrandTheme extends Equatable {
+  final BrandPalette light;
+  final BrandPalette dark;
+
+  const BrandTheme({required this.light, required this.dark});
+
+  /// Monochrome black & white palette: pure neutrals in both modes (dark is
+  /// the mirror of light). Only `error` keeps a hue, for error semantics.
   static const BrandTheme fallback = BrandTheme(
-    primary: Color(0xFF0F4C81),
-    secondary: Color(0xFF2C3E50),
-    accent: Color(0xFF00A8CC),
-    text: Color(0xFF1C2833),
-    background: Color(0xFFFAFAFA),
+    light: BrandPalette(
+      primary: Color(0xFF141414),
+      secondary: Color(0xFF3D3D3D),
+      accent: Color(0xFF525252),
+      text: Color(0xFF000000),
+      background: Color(0xFFF5F5F5),
+      surface: Color(0xFFFFFFFF),
+    ),
+    dark: BrandPalette(
+      primary: Color(0xFFFAFAFA),
+      secondary: Color(0xFFA3A3A3),
+      accent: Color(0xFFD4D4D4),
+      text: Color(0xFFF5F5F5),
+      background: Color(0xFF0A0A0A),
+      surface: Color(0xFF171717),
+    ),
   );
 
-  ThemeData toThemeData(Brightness brightness) {
+  OutlineInputBorder _buildBorder(Color color) => OutlineInputBorder(
+    borderRadius: BorderRadius.circular(15.0),
+    borderSide: BorderSide(color: color),
+  );
+
+  static const Color _darkInk = Color(0xFF161C23);
+
+  static Color _onColorFor(Color color) =>
+      ThemeData.estimateBrightnessForColor(color) == Brightness.dark
+      ? Colors.white
+      : _darkInk;
+
+  ThemeData _buildTheme(BrandPalette palette, Brightness brightness) {
     final isDark = brightness == Brightness.dark;
 
-    final base = ColorScheme.fromSeed(
-      seedColor: primary,
-      brightness: brightness,
-    );
+    final scheme =
+        ColorScheme.fromSeed(
+          seedColor: palette.primary,
+          brightness: brightness,
+        ).copyWith(
+          primary: palette.primary,
+          onPrimary: _onColorFor(palette.primary),
+          secondary: palette.secondary,
+          onSecondary: _onColorFor(palette.secondary),
+          tertiary: palette.accent,
+          onError: isDark ? _darkInk : Colors.white,
+          surface: palette.surface,
+          onSurface: palette.text,
+          outlineVariant: palette.text.withValues(alpha: 0.2),
+        );
 
-    final scheme = isDark
-        ? base.copyWith(
-            primary: secondary,
-            onPrimary: background,
-            secondary: accent,
-            onSecondary: primary,
-            tertiary: accent,
-            onTertiary: primary,
-            surface: text,
-            onSurface: background,
-            surfaceContainerLow: primary,
-            surfaceContainer: primary,
-            outlineVariant: accent,
-          )
-        : base.copyWith(
-            primary: primary,
-            onPrimary: background,
-            secondary: secondary,
-            onSecondary: background,
-            tertiary: accent,
-            onTertiary: primary,
-            surface: background,
-            onSurface: text,
-            outlineVariant: secondary,
-          );
+    final textTheme = GoogleFonts.poppinsTextTheme(
+      isDark ? ThemeData.dark().textTheme : ThemeData.light().textTheme,
+    ).apply(bodyColor: scheme.onSurface, displayColor: scheme.onSurface);
 
-    OutlineInputBorder border(Color color) => OutlineInputBorder(
-      borderRadius: BorderRadius.circular(15.0),
-      borderSide: BorderSide(color: color),
-    );
-
-    final textTheme = GoogleFonts.poppinsTextTheme().apply(
-      bodyColor: scheme.onSurface,
-      displayColor: scheme.onSurface,
-    );
+    final appBarForeground = isDark ? palette.text : scheme.onPrimary;
 
     return ThemeData(
       useMaterial3: true,
+      brightness: brightness,
       colorScheme: scheme,
       textTheme: textTheme,
-      primaryColor: scheme.primary,
-      scaffoldBackgroundColor: scheme.surface,
-      inputDecorationTheme: InputDecorationTheme(
-        border: border(scheme.outlineVariant),
-        enabledBorder: border(scheme.outlineVariant),
-        focusedBorder: border(scheme.primary),
-        errorBorder: border(scheme.error),
-        focusedErrorBorder: border(scheme.error),
-        disabledBorder: border(scheme.outlineVariant.withValues(alpha: 0.5)),
+      scaffoldBackgroundColor: palette.background,
+      cardTheme: CardThemeData(
+        color: palette.surface,
+        surfaceTintColor: Colors.transparent,
       ),
-      iconTheme: IconThemeData(color: scheme.secondary),
+      dividerTheme: DividerThemeData(color: scheme.outlineVariant),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: palette.surface,
+        border: _buildBorder(scheme.outlineVariant),
+        enabledBorder: _buildBorder(scheme.outlineVariant),
+        focusedBorder: _buildBorder(scheme.primary),
+        errorBorder: _buildBorder(scheme.error),
+      ),
       appBarTheme: AppBarTheme(
-        backgroundColor: scheme.primary,
-        centerTitle: true,
+        backgroundColor: isDark ? palette.surface : palette.primary,
+        elevation: 0,
         titleTextStyle: textTheme.titleLarge?.copyWith(
-          color: scheme.onPrimary,
+          color: appBarForeground,
           fontSize: 20.0,
           fontWeight: FontWeight.w600,
         ),
-        iconTheme: IconThemeData(color: scheme.onPrimary),
+        iconTheme: IconThemeData(color: appBarForeground),
       ),
     );
   }
 
+  ThemeData toLightTheme() => _buildTheme(light, Brightness.light);
+  ThemeData toDarkTheme() => _buildTheme(dark, Brightness.dark);
+
   @override
-  List<Object?> get props => [primary, secondary, accent, text, background];
+  List<Object?> get props => [light, dark];
 }

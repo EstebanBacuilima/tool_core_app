@@ -44,8 +44,8 @@ class _ToolCoreAppState extends State<ToolCoreApp> {
             routerConfig: _router,
             // Same brand seed in both modes; themeMode decides which one
             // is active (system follows the device).
-            theme: themeState.brand.toThemeData(Brightness.light),
-            darkTheme: themeState.brand.toThemeData(Brightness.dark),
+            theme: themeState.brand.toLightTheme(),
+            darkTheme: themeState.brand.toLightTheme(),
             themeMode: themeState.mode,
             // Use device language by default
             locale: null,
