@@ -6,6 +6,12 @@
   "usernameLabel": "Username",
   "passwordLabel": "Password",
   "loginButton": "Sign in",
+  "appVersion": "v{version}",
+  "@appVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
   "requiredField": "This field is required",
   "homeTitle": "Home",
   "homeGreeting": "Hi",
