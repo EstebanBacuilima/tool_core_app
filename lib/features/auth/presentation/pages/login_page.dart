@@ -6,6 +6,7 @@ import 'package:tool_core_app/l10n/app_localizations.dart';
 
 import '../../../../core/di/injector.dart';
 import '../../../../core/errors/error_localizer.dart';
+import '../../../../core/widgets/staggered_reveal.dart';
 import '../cubit/login_cubit.dart';
 import '../cubit/login_state.dart';
 
@@ -80,22 +81,11 @@ class _LoginViewState extends State<_LoginView>
     );
   }
 
-  /// Fade + slide-up reveal for one section of the page; [interval] staggers
-  /// the sections against the single entrance controller.
   Widget _animatedSection({required Interval interval, required Widget child}) {
-    final animation = CurvedAnimation(
+    return StaggeredReveal(
       parent: _entranceController,
-      curve: interval,
-    );
-    return FadeTransition(
-      opacity: animation,
-      child: SlideTransition(
-        position: Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero)
-            .animate(
-              CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
-            ),
-        child: child,
-      ),
+      interval: interval,
+      child: child,
     );
   }
 
