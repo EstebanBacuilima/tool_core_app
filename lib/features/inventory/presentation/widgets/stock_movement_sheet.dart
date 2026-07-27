@@ -56,11 +56,11 @@ class _StockMovementSheetState extends State<_StockMovementSheet> {
     if (!_formKey.currentState!.validate()) return;
     final reason = _reasonController.text.trim();
     context.read<StockMovementCubit>().submit(
-          productCode: widget.product.code,
-          type: _type,
-          quantity: _parseQuantity(_quantityController.text)!,
-          reason: reason.isEmpty ? null : reason,
-        );
+      productCode: widget.product.code,
+      type: _type,
+      quantity: _parseQuantity(_quantityController.text)!,
+      reason: reason.isEmpty ? null : reason,
+    );
   }
 
   @override
@@ -89,124 +89,125 @@ class _StockMovementSheetState extends State<_StockMovementSheet> {
 
         return Padding(
           padding: EdgeInsets.only(
-            left: 24,
-            right: 24,
-            top: 16,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+            bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: scheme.outlineVariant,
-                      borderRadius: BorderRadius.circular(999),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: scheme.outlineVariant,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  l10n.stockMovement,
-                  style: textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  widget.product.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: scheme.onSurface.withValues(alpha: 0.65),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                SegmentedButton<MovementType>(
-                  segments: [
-                    ButtonSegment(
-                      value: MovementType.entry,
-                      icon: const Icon(Icons.arrow_downward),
-                      label: Text(l10n.movementEntry),
-                    ),
-                    ButtonSegment(
-                      value: MovementType.exit,
-                      icon: const Icon(Icons.arrow_upward),
-                      label: Text(l10n.movementExit),
-                    ),
-                    ButtonSegment(
-                      value: MovementType.adjustment,
-                      icon: const Icon(Icons.tune),
-                      label: Text(l10n.movementAdjustment),
-                    ),
-                  ],
-                  selected: {_type},
-                  onSelectionChanged: isSaving
-                      ? null
-                      : (selection) =>
-                          setState(() => _type = selection.first),
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _quantityController,
-                  enabled: !isSaving,
-                  autofocus: true,
-                  textInputAction: TextInputAction.next,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  decoration: InputDecoration(
-                    labelText: l10n.quantity,
-                    prefixIcon: const Icon(Icons.numbers_outlined),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return l10n.requiredField;
-                    }
-                    final quantity = _parseQuantity(value);
-                    // adjustment admits 0 (set the count to zero).
-                    final min = _type == MovementType.adjustment ? -1 : 0;
-                    if (quantity == null || quantity <= min) {
-                      return l10n.invalidQuantity;
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _reasonController,
-                  enabled: !isSaving,
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: InputDecoration(
-                    labelText: l10n.movementReason,
-                    prefixIcon: const Icon(Icons.notes_outlined),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                FilledButton(
-                  onPressed: isSaving ? null : _onSubmit,
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size.fromHeight(52),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    textStyle: textTheme.titleMedium?.copyWith(
+                  const SizedBox(height: 20),
+                  Text(
+                    l10n.stockMovement,
+                    style: textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  child: isSaving
-                      ? const SizedBox(
-                          height: 22,
-                          width: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2.5),
-                        )
-                      : Text(l10n.save),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    widget.product.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: scheme.onSurface.withValues(alpha: 0.65),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  SegmentedButton<MovementType>(
+                    segments: [
+                      ButtonSegment(
+                        value: MovementType.entry,
+                        icon: const Icon(Icons.arrow_downward),
+                        label: Text(l10n.movementEntry),
+                      ),
+                      ButtonSegment(
+                        value: MovementType.exit,
+                        icon: const Icon(Icons.arrow_upward),
+                        label: Text(l10n.movementExit),
+                      ),
+                      ButtonSegment(
+                        value: MovementType.adjustment,
+                        icon: const Icon(Icons.tune),
+                        label: Text(l10n.movementAdjustment),
+                      ),
+                    ],
+                    selected: {_type},
+                    onSelectionChanged: isSaving
+                        ? null
+                        : (selection) =>
+                              setState(() => _type = selection.first),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _quantityController,
+                    enabled: !isSaving,
+                    autofocus: true,
+                    textInputAction: TextInputAction.next,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: InputDecoration(
+                      labelText: l10n.quantity,
+                      prefixIcon: const Icon(Icons.numbers_outlined),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return l10n.requiredField;
+                      }
+                      final quantity = _parseQuantity(value);
+                      // adjustment admits 0 (set the count to zero).
+                      final min = _type == MovementType.adjustment ? -1 : 0;
+                      if (quantity == null || quantity <= min) {
+                        return l10n.invalidQuantity;
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _reasonController,
+                    enabled: !isSaving,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(
+                      labelText: l10n.movementReason,
+                      prefixIcon: const Icon(Icons.notes_outlined),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  FilledButton(
+                    onPressed: isSaving ? null : _onSubmit,
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(52),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      textStyle: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    child: isSaving
+                        ? const SizedBox(
+                            height: 22,
+                            width: 22,
+                            child: CircularProgressIndicator(strokeWidth: 2.5),
+                          )
+                        : Text(l10n.save),
+                  ),
+                ],
+              ),
             ),
           ),
         );

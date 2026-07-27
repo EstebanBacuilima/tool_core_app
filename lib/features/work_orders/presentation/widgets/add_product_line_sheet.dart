@@ -114,85 +114,84 @@ class _AddProductLineSheetState extends State<_AddProductLineSheet> {
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.75,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SheetHandle(),
-              const SizedBox(height: 20),
-              Text(
-                l10n.addProduct,
-                style: textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SheetHandle(),
+            const SizedBox(height: 20),
+            Text(
+              l10n.addProduct,
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w600,
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _searchController,
-                onChanged: _onSearchChanged,
-                decoration: InputDecoration(
-                  hintText: l10n.searchProducts,
-                  prefixIcon: const Icon(Icons.search),
-                  isDense: true,
-                ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _searchController,
+              onChanged: _onSearchChanged,
+              decoration: InputDecoration(
+                hintText: l10n.searchProducts,
+                prefixIcon: const Icon(Icons.search),
+                isDense: true,
               ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: _searching
-                    ? const Center(child: CircularProgressIndicator())
-                    : ListView.builder(
-                        itemCount: _results.length,
-                        itemBuilder: (context, index) {
-                          final product = _results[index];
-                          final selected = _selected?.code == product.code;
-                          return ListTile(
-                            dense: true,
-                            selected: selected,
-                            leading: Icon(
-                              selected
-                                  ? Icons.check_circle
-                                  : Icons.settings_suggest_outlined,
-                              color: selected
-                                  ? scheme.primary
-                                  : scheme.secondary,
-                            ),
-                            title: Text(product.name),
-                            subtitle: Text(
-                              '\$${product.salePriceWithTax.toStringAsFixed(2)}'
-                              ' • ${l10n.stockLabel}: '
-                              '${product.stock?.toStringAsFixed(0) ?? '0'}',
-                            ),
-                            onTap: () => setState(() => _selected = product),
-                          );
-                        },
-                      ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: (MediaQuery.of(context).size.height * 0.35).clamp(
+                180.0,
+                320.0,
               ),
-              TextField(
-                controller: _quantityController,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                onChanged: (_) => setState(() {}),
-                decoration: InputDecoration(
-                  labelText: l10n.quantity,
-                  prefixIcon: const Icon(Icons.numbers_outlined),
-                ),
+              child: _searching
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: _results.length,
+                      itemBuilder: (context, index) {
+                        final product = _results[index];
+                        final selected = _selected?.code == product.code;
+                        return ListTile(
+                          dense: true,
+                          selected: selected,
+                          leading: Icon(
+                            selected
+                                ? Icons.check_circle
+                                : Icons.settings_suggest_outlined,
+                            color: selected ? scheme.primary : scheme.secondary,
+                          ),
+                          title: Text(product.name),
+                          subtitle: Text(
+                            '\$${product.salePriceWithTax.toStringAsFixed(2)}'
+                            ' • ${l10n.stockLabel}: '
+                            '${product.stock?.toStringAsFixed(0) ?? '0'}',
+                          ),
+                          onTap: () => setState(() => _selected = product),
+                        );
+                      },
+                    ),
+            ),
+            TextField(
+              controller: _quantityController,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
               ),
-              SheetErrorBanner(errorCode: _errorCode),
-              const SizedBox(height: 16),
-              SheetSubmitButton(
-                saving: _saving,
-                onPressed:
-                    (_selected != null && quantity != null && quantity > 0)
-                    ? _onSubmit
-                    : null,
-                label: l10n.save,
+              onChanged: (_) => setState(() {}),
+              decoration: InputDecoration(
+                labelText: l10n.quantity,
+                prefixIcon: const Icon(Icons.numbers_outlined),
               ),
-            ],
-          ),
+            ),
+            SheetErrorBanner(errorCode: _errorCode),
+            const SizedBox(height: 16),
+            SheetSubmitButton(
+              saving: _saving,
+              onPressed: (_selected != null && quantity != null && quantity > 0)
+                  ? _onSubmit
+                  : null,
+              label: l10n.save,
+            ),
+          ],
         ),
       ),
     );

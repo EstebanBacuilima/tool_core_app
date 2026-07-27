@@ -102,89 +102,93 @@ class _AddPaymentSheetState extends State<_AddPaymentSheet> {
 
     return Padding(
       padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SheetHandle(),
-          const SizedBox(height: 20),
-          Text(
-            l10n.addPayment,
-            style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '${l10n.balanceLabel}: \$${widget.balance.toStringAsFixed(2)}',
-            style: textTheme.bodyMedium?.copyWith(
-              color: scheme.onSurface.withValues(alpha: 0.65),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SheetHandle(),
+            const SizedBox(height: 20),
+            Text(
+              l10n.addPayment,
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          TextField(
-            controller: _amountController,
-            autofocus: true,
-            onChanged: (_) => setState(() {}),
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: InputDecoration(
-              labelText: l10n.paymentAmount,
-              prefixIcon: const Icon(Icons.attach_money_outlined),
+            const SizedBox(height: 4),
+            Text(
+              '${l10n.balanceLabel}: \$${widget.balance.toStringAsFixed(2)}',
+              style: textTheme.bodyMedium?.copyWith(
+                color: scheme.onSurface.withValues(alpha: 0.65),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          DropdownButtonFormField<PaymentMethod>(
-            initialValue: _method,
-            decoration: InputDecoration(
-              labelText: l10n.paymentMethod,
-              prefixIcon: const Icon(Icons.payments_outlined),
+            const SizedBox(height: 20),
+            TextField(
+              controller: _amountController,
+              autofocus: true,
+              onChanged: (_) => setState(() {}),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              decoration: InputDecoration(
+                labelText: l10n.paymentAmount,
+                prefixIcon: const Icon(Icons.attach_money_outlined),
+              ),
             ),
-            items: [
-              for (final method in PaymentMethod.values)
-                DropdownMenuItem(
-                  value: method,
-                  child: Text(_methodLabel(l10n, method)),
-                ),
-            ],
-            onChanged: _saving
-                ? null
-                : (value) => setState(() => _method = value!),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _referenceController,
-                  decoration: InputDecoration(
-                    labelText: l10n.paymentReference,
-                    prefixIcon: const Icon(Icons.tag_outlined),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<PaymentMethod>(
+              initialValue: _method,
+              decoration: InputDecoration(
+                labelText: l10n.paymentMethod,
+                prefixIcon: const Icon(Icons.payments_outlined),
+              ),
+              items: [
+                for (final method in PaymentMethod.values)
+                  DropdownMenuItem(
+                    value: method,
+                    child: Text(_methodLabel(l10n, method)),
+                  ),
+              ],
+              onChanged: _saving
+                  ? null
+                  : (value) => setState(() => _method = value!),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _referenceController,
+                    decoration: InputDecoration(
+                      labelText: l10n.paymentReference,
+                      prefixIcon: const Icon(Icons.tag_outlined),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextField(
-                  controller: _notesController,
-                  decoration: InputDecoration(
-                    labelText: l10n.paymentNotes,
-                    prefixIcon: const Icon(Icons.notes_outlined),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: _notesController,
+                    decoration: InputDecoration(
+                      labelText: l10n.paymentNotes,
+                      prefixIcon: const Icon(Icons.notes_outlined),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          SheetErrorBanner(errorCode: _errorCode),
-          const SizedBox(height: 24),
-          SheetSubmitButton(
-            saving: _saving,
-            onPressed: (amount != null && amount > 0) ? _onSubmit : null,
-            label: l10n.save,
-          ),
-        ],
+              ],
+            ),
+            SheetErrorBanner(errorCode: _errorCode),
+            const SizedBox(height: 24),
+            SheetSubmitButton(
+              saving: _saving,
+              onPressed: (amount != null && amount > 0) ? _onSubmit : null,
+              label: l10n.save,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -102,103 +102,104 @@ class _ServiceFormSheetState extends State<_ServiceFormSheet> {
 
         return Padding(
           padding: EdgeInsets.only(
-            left: 24,
-            right: 24,
-            top: 16,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+            bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: scheme.outlineVariant,
-                      borderRadius: BorderRadius.circular(999),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: scheme.outlineVariant,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  _isEdit ? l10n.serviceEdit : l10n.serviceNew,
-                  style: textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  controller: _nameController,
-                  enabled: !isSaving,
-                  textInputAction: TextInputAction.next,
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: InputDecoration(
-                    labelText: l10n.serviceName,
-                    prefixIcon: const Icon(Icons.handyman_outlined),
-                  ),
-                  validator: (value) => (value == null || value.trim().isEmpty)
-                      ? l10n.requiredField
-                      : null,
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _priceController,
-                  enabled: !isSaving,
-                  textInputAction: TextInputAction.next,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: l10n.servicePrice,
-                    helperText: l10n.priceWithTaxHelper,
-                    prefixIcon: const Icon(Icons.attach_money_outlined),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return l10n.requiredField;
-                    }
-                    final price = _parsePrice(value);
-                    if (price == null || price <= 0) return l10n.invalidPrice;
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _descriptionController,
-                  enabled: !isSaving,
-                  maxLines: 3,
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: InputDecoration(
-                    labelText: l10n.serviceDescription,
-                    alignLabelWithHint: true,
-                    prefixIcon: const Icon(Icons.notes_outlined),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                FilledButton(
-                  onPressed: isSaving ? null : _onSubmit,
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size.fromHeight(52),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    textStyle: textTheme.titleMedium?.copyWith(
+                  const SizedBox(height: 20),
+                  Text(
+                    _isEdit ? l10n.serviceEdit : l10n.serviceNew,
+                    style: textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  child: isSaving
-                      ? const SizedBox(
-                          height: 22,
-                          width: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2.5),
-                        )
-                      : Text(l10n.save),
-                ),
-              ],
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: _nameController,
+                    enabled: !isSaving,
+                    textInputAction: TextInputAction.next,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(
+                      labelText: l10n.serviceName,
+                      prefixIcon: const Icon(Icons.handyman_outlined),
+                    ),
+                    validator: (value) =>
+                        (value == null || value.trim().isEmpty)
+                        ? l10n.requiredField
+                        : null,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _priceController,
+                    enabled: !isSaving,
+                    textInputAction: TextInputAction.next,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: InputDecoration(
+                      labelText: l10n.servicePrice,
+                      helperText: l10n.priceWithTaxHelper,
+                      prefixIcon: const Icon(Icons.attach_money_outlined),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return l10n.requiredField;
+                      }
+                      final price = _parsePrice(value);
+                      if (price == null || price <= 0) return l10n.invalidPrice;
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _descriptionController,
+                    enabled: !isSaving,
+                    maxLines: 3,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(
+                      labelText: l10n.serviceDescription,
+                      alignLabelWithHint: true,
+                      prefixIcon: const Icon(Icons.notes_outlined),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  FilledButton(
+                    onPressed: isSaving ? null : _onSubmit,
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(52),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      textStyle: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    child: isSaving
+                        ? const SizedBox(
+                            height: 22,
+                            width: 22,
+                            child: CircularProgressIndicator(strokeWidth: 2.5),
+                          )
+                        : Text(l10n.save),
+                  ),
+                ],
+              ),
             ),
           ),
         );

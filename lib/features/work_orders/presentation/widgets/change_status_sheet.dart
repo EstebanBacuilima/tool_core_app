@@ -110,73 +110,75 @@ class _ChangeStatusSheetState extends State<_ChangeStatusSheet> {
 
     return Padding(
       padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SheetHandle(),
-          const SizedBox(height: 20),
-          Text(
-            l10n.advanceStatus,
-            style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 16),
-          for (final status in _forwardOptions)
-            ListTile(
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-              leading: Icon(
-                _selectedCode == status.code
-                    ? Icons.check_circle
-                    : Icons.radio_button_unchecked,
-                color: _selectedCode == status.code
-                    ? scheme.primary
-                    : scheme.outlineVariant,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SheetHandle(),
+            const SizedBox(height: 20),
+            Text(
+              l10n.advanceStatus,
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w600,
               ),
-              title: Text(status.name),
-              onTap: _saving
-                  ? null
-                  : () => setState(() => _selectedCode = status.code),
             ),
-          if (cancel != null)
-            ListTile(
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-              leading: Icon(
-                _selectedCode == cancel.code
-                    ? Icons.check_circle
-                    : Icons.radio_button_unchecked,
-                color: _selectedCode == cancel.code
-                    ? scheme.error
-                    : scheme.outlineVariant,
+            const SizedBox(height: 16),
+            for (final status in _forwardOptions)
+              ListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(
+                  _selectedCode == status.code
+                      ? Icons.check_circle
+                      : Icons.radio_button_unchecked,
+                  color: _selectedCode == status.code
+                      ? scheme.primary
+                      : scheme.outlineVariant,
+                ),
+                title: Text(status.name),
+                onTap: _saving
+                    ? null
+                    : () => setState(() => _selectedCode = status.code),
               ),
-              title: Text(cancel.name, style: TextStyle(color: scheme.error)),
-              onTap: _saving
-                  ? null
-                  : () => setState(() => _selectedCode = cancel.code),
+            if (cancel != null)
+              ListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(
+                  _selectedCode == cancel.code
+                      ? Icons.check_circle
+                      : Icons.radio_button_unchecked,
+                  color: _selectedCode == cancel.code
+                      ? scheme.error
+                      : scheme.outlineVariant,
+                ),
+                title: Text(cancel.name, style: TextStyle(color: scheme.error)),
+                onTap: _saving
+                    ? null
+                    : () => setState(() => _selectedCode = cancel.code),
+              ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _commentController,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(
+                labelText: l10n.statusComment,
+                prefixIcon: const Icon(Icons.notes_outlined),
+              ),
             ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _commentController,
-            textCapitalization: TextCapitalization.sentences,
-            decoration: InputDecoration(
-              labelText: l10n.statusComment,
-              prefixIcon: const Icon(Icons.notes_outlined),
+            SheetErrorBanner(errorCode: _errorCode),
+            const SizedBox(height: 24),
+            SheetSubmitButton(
+              saving: _saving,
+              onPressed: _selectedCode != null ? _onSubmit : null,
+              label: l10n.save,
             ),
-          ),
-          SheetErrorBanner(errorCode: _errorCode),
-          const SizedBox(height: 24),
-          SheetSubmitButton(
-            saving: _saving,
-            onPressed: _selectedCode != null ? _onSubmit : null,
-            label: l10n.save,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
