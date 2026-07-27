@@ -50,6 +50,7 @@ class CreateOrderCubit extends Cubit<CreateOrderState> {
     if (!state.vehiclesHasMore || state.loadingMoreVehicles) return;
     emit(state.copyWith(loadingMoreVehicles: true));
     try {
+      final result = await _customersRepository.searchVehicles(
         _vehiclesQuery,
         page: _vehiclesPage + 1,
       );
