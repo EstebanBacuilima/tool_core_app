@@ -81,10 +81,7 @@ class _InventoryViewState extends State<_InventoryView> {
     ScaffoldMessenger.of(context)
       ..clearSnackBars()
       ..showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
-          content: Text(message),
-        ),
+        SnackBar(behavior: SnackBarBehavior.floating, content: Text(message)),
       );
   }
 
@@ -97,58 +94,58 @@ class _InventoryViewState extends State<_InventoryView> {
       floatingActionButton: BlocBuilder<InventoryCubit, InventoryState>(
         builder: (context, state) => switch (state) {
           // The form needs the categories: only offer it once loaded.
-          InventoryLoaded(:final categories) =>
-            FloatingActionButton.extended(
-              onPressed: () =>
-                  _openProductForm(context, categories: categories),
-              icon: const Icon(Icons.add),
-              label: Text(l10n.productNew),
-            ),
+          InventoryLoaded(:final categories) => FloatingActionButton.extended(
+            onPressed: () => _openProductForm(context, categories: categories),
+            icon: const Icon(Icons.add),
+            label: Text(l10n.productNew),
+          ),
           _ => const SizedBox.shrink(),
         },
       ),
       body: BlocBuilder<InventoryCubit, InventoryState>(
         builder: (context, state) {
           return switch (state) {
-            InventoryInitial() ||
-            InventoryLoading() =>
-              const Center(child: CircularProgressIndicator()),
+            InventoryInitial() || InventoryLoading() => const Center(
+              child: CircularProgressIndicator(),
+            ),
             InventoryFailure(:final code) => _ErrorView(code: code),
             InventoryLoaded() => Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                    child: TextField(
-                      controller: _searchController,
-                      onChanged: _onSearchChanged,
-                      textInputAction: TextInputAction.search,
-                      decoration: InputDecoration(
-                        hintText: l10n.searchProducts,
-                        prefixIcon: const Icon(Icons.search),
-                        isDense: true,
-                      ),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: _onSearchChanged,
+                    textInputAction: TextInputAction.search,
+                    decoration: InputDecoration(
+                      hintText: l10n.searchProducts,
+                      prefixIcon: const Icon(Icons.search),
+                      isDense: true,
                     ),
                   ),
+                ),
+                // Hidden while the keyboard is open: in landscape the
+                // fixed search + chips would not leave room for the list.
+                if (MediaQuery.of(context).viewInsets.bottom == 0)
                   _CategoryChips(state: state),
-                  Expanded(
-                    child: _ProductList(
-                      state: state,
-                      onEdit: (product) => _openProductForm(
-                        context,
-                        categories: state.categories,
-                        product: product,
-                      ),
-                      onMovement: (product) => _openMovement(context, product),
+                Expanded(
+                  child: _ProductList(
+                    state: state,
+                    onEdit: (product) => _openProductForm(
+                      context,
+                      categories: state.categories,
+                      product: product,
                     ),
+                    onMovement: (product) => _openMovement(context, product),
                   ),
-                ],
-              ),
+                ),
+              ],
+            ),
           };
         },
       ),
     );
   }
-
 }
 
 /// Horizontal filter: "all" + every category (children indented by the
@@ -159,8 +156,8 @@ class _CategoryChips extends StatelessWidget {
   const _CategoryChips({required this.state});
 
   List<ProductCategory> _flatten(List<ProductCategory> categories) => [
-        for (final c in categories) ...[c, ..._flatten(c.children)],
-      ];
+    for (final c in categories) ...[c, ..._flatten(c.children)],
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -218,22 +215,25 @@ class _ProductList extends StatelessWidget {
       final filtered =
           state.search.isNotEmpty || state.selectedCategoryCode != null;
       return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              filtered ? Icons.search_off : Icons.inventory_2_outlined,
-              size: 64,
-              color: scheme.onSurface.withValues(alpha: 0.3),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              filtered ? l10n.noResults : l10n.inventoryEmpty,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: scheme.onSurface.withValues(alpha: 0.6),
-                  ),
-            ),
-          ],
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                filtered ? Icons.search_off : Icons.inventory_2_outlined,
+                size: 64,
+                color: scheme.onSurface.withValues(alpha: 0.3),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                filtered ? l10n.noResults : l10n.inventoryEmpty,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -291,9 +291,8 @@ class _ProductTile extends StatelessWidget {
     required this.onMovement,
   });
 
-  String _formatStock(double stock) => stock % 1 == 0
-      ? stock.toStringAsFixed(0)
-      : stock.toStringAsFixed(2);
+  String _formatStock(double stock) =>
+      stock % 1 == 0 ? stock.toStringAsFixed(0) : stock.toStringAsFixed(2);
 
   @override
   Widget build(BuildContext context) {
@@ -385,40 +384,46 @@ class _ProductTile extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    '\$${product.salePriceWithTax.toStringAsFixed(2)}',
-                    style: textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 150),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '\$${product.salePriceWithTax.toStringAsFixed(2)}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: stockColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        '${l10n.stockLabel}: ${_formatStock(stock)}'
+                        '${unitLabel != null ? ' $unitLabel' : ''}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.labelSmall?.copyWith(
+                          color: stockColor,
+                        ),
+                      ),
                     ),
-                    decoration: BoxDecoration(
-                      color: stockColor.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Text(
-                      '${l10n.stockLabel}: ${_formatStock(stock)}'
-                      '${unitLabel != null ? ' $unitLabel' : ''}',
-                      style: textTheme.labelSmall?.copyWith(color: stockColor),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               IconButton(
                 tooltip: l10n.stockMovement,
                 onPressed: onMovement,
-                icon: Icon(
-                  Icons.swap_vert,
-                  color: scheme.secondary,
-                ),
+                icon: Icon(Icons.swap_vert, color: scheme.secondary),
               ),
             ],
           ),
@@ -439,23 +444,26 @@ class _ErrorView extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.cloud_off_outlined, size: 64, color: scheme.error),
-          const SizedBox(height: 12),
-          Text(
-            localizeErrorCode(l10n, code),
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 16),
-          OutlinedButton.icon(
-            onPressed: () => context.read<InventoryCubit>().load(),
-            icon: const Icon(Icons.refresh),
-            label: Text(l10n.retry),
-          ),
-        ],
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.cloud_off_outlined, size: 64, color: scheme.error),
+            const SizedBox(height: 12),
+            Text(
+              localizeErrorCode(l10n, code),
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: () => context.read<InventoryCubit>().load(),
+              icon: const Icon(Icons.refresh),
+              label: Text(l10n.retry),
+            ),
+          ],
+        ),
       ),
     );
   }

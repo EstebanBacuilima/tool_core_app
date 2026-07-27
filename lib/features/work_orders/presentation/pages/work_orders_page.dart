@@ -99,38 +99,41 @@ class _WorkOrdersViewState extends State<_WorkOrdersView> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 56,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
-                    ),
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: FilterChip(
-                          label: Text(l10n.allStatuses),
-                          selected: state.selectedStatusCode == null,
-                          onSelected: (_) =>
-                              context.read<WorkOrdersCubit>().setStatus(null),
-                        ),
+                // Hidden while the keyboard is open: in landscape the
+                // fixed search + chips would not leave room for the list.
+                if (MediaQuery.of(context).viewInsets.bottom == 0)
+                  SizedBox(
+                    height: 56,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
                       ),
-                      for (final status in state.statuses)
+                      children: [
                         Padding(
                           padding: const EdgeInsets.only(right: 8),
                           child: FilterChip(
-                            label: Text(status.name),
-                            selected: state.selectedStatusCode == status.code,
-                            onSelected: (_) => context
-                                .read<WorkOrdersCubit>()
-                                .setStatus(status.code),
+                            label: Text(l10n.allStatuses),
+                            selected: state.selectedStatusCode == null,
+                            onSelected: (_) =>
+                                context.read<WorkOrdersCubit>().setStatus(null),
                           ),
                         ),
-                    ],
+                        for (final status in state.statuses)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: FilterChip(
+                              label: Text(status.name),
+                              selected: state.selectedStatusCode == status.code,
+                              onSelected: (_) => context
+                                  .read<WorkOrdersCubit>()
+                                  .setStatus(status.code),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
-                ),
                 Expanded(child: _OrderList(state: state)),
               ],
             ),
@@ -155,22 +158,25 @@ class _OrderList extends StatelessWidget {
       final filtered =
           state.search.isNotEmpty || state.selectedStatusCode != null;
       return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              filtered ? Icons.search_off : Icons.assignment_outlined,
-              size: 64,
-              color: scheme.onSurface.withValues(alpha: 0.3),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              filtered ? l10n.noResults : l10n.ordersEmpty,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: scheme.onSurface.withValues(alpha: 0.6),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                filtered ? Icons.search_off : Icons.assignment_outlined,
+                size: 64,
+                color: scheme.onSurface.withValues(alpha: 0.3),
               ),
-            ),
-          ],
+              const SizedBox(height: 12),
+              Text(
+                filtered ? l10n.noResults : l10n.ordersEmpty,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -319,29 +325,53 @@ class _OrderTile extends StatelessWidget {
                     color: scheme.onSurface.withValues(alpha: 0.6),
                   ),
                   const SizedBox(width: 4),
-                  Text(order.vehiclePlate, style: textTheme.bodySmall),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 120),
+                    child: Text(
+                      order.vehiclePlate,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.bodySmall,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Text(
-                    '${l10n.totalLabel}: \$${order.total.toStringAsFixed(2)}',
-                    style: textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w600,
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            '${l10n.totalLabel}: '
+                            '\$${order.total.toStringAsFixed(2)}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        if (order.balance > 0) ...[
+                          const SizedBox(width: 12),
+                          Flexible(
+                            child: Text(
+                              '${l10n.balanceLabel}: '
+                              '\$${order.balance.toStringAsFixed(2)}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: scheme.error,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  if (order.balance > 0)
-                    Text(
-                      '${l10n.balanceLabel}: '
-                      '\$${order.balance.toStringAsFixed(2)}',
-                      style: textTheme.bodySmall?.copyWith(
-                        color: scheme.error,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  const Spacer(),
+                  const SizedBox(width: 8),
                   Text(
                     _paymentLabel(l10n),
                     style: textTheme.labelSmall?.copyWith(
@@ -369,23 +399,26 @@ class _ErrorView extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.cloud_off_outlined, size: 64, color: scheme.error),
-          const SizedBox(height: 12),
-          Text(
-            localizeErrorCode(l10n, code),
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 16),
-          OutlinedButton.icon(
-            onPressed: () => context.read<WorkOrdersCubit>().load(),
-            icon: const Icon(Icons.refresh),
-            label: Text(l10n.retry),
-          ),
-        ],
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.cloud_off_outlined, size: 64, color: scheme.error),
+            const SizedBox(height: 12),
+            Text(
+              localizeErrorCode(l10n, code),
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            OutlinedButton.icon(
+              onPressed: () => context.read<WorkOrdersCubit>().load(),
+              icon: const Icon(Icons.refresh),
+              label: Text(l10n.retry),
+            ),
+          ],
+        ),
       ),
     );
   }

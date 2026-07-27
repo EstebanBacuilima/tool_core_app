@@ -32,7 +32,9 @@ class HomePage extends StatelessWidget {
     final tints = [scheme.primary, scheme.secondary, scheme.tertiary];
 
     return Scaffold(
-      appBar: const HomeAppBar(),
+      appBar: HomeAppBar(
+        height: 64 + 24 * MediaQuery.textScalerOf(context).scale(14) / 14,
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -40,19 +42,22 @@ class HomePage extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 24, 20, 4),
             child: Text(
               l10n.homeMenuTitle,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(16),
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                 maxCrossAxisExtent: 200,
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
-                childAspectRatio: 1.1,
+                // Tile height follows the system text scale: a fixed aspect
+                // ratio overflows with 2-line labels + the coming-soon chip.
+                mainAxisExtent:
+                    112 + 44 * MediaQuery.textScalerOf(context).scale(14) / 14,
               ),
               itemCount: items.length,
               itemBuilder: (context, index) {

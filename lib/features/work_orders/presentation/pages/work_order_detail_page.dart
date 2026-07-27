@@ -85,17 +85,20 @@ class _DetailView extends StatelessWidget {
           OrderDetailFailure(:final code) => Scaffold(
             appBar: AppBar(),
             body: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(localizeErrorCode(l10n, code)),
-                  const SizedBox(height: 16),
-                  OutlinedButton.icon(
-                    onPressed: () => context.read<OrderDetailCubit>().load(),
-                    icon: const Icon(Icons.refresh),
-                    label: Text(l10n.retry),
-                  ),
-                ],
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(localizeErrorCode(l10n, code)),
+                    const SizedBox(height: 16),
+                    OutlinedButton.icon(
+                      onPressed: () => context.read<OrderDetailCubit>().load(),
+                      icon: const Icon(Icons.refresh),
+                      label: Text(l10n.retry),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -284,11 +287,13 @@ class _StatusStrip extends StatelessWidget {
           children: [
             Icon(Icons.cancel_outlined, color: scheme.error),
             const SizedBox(width: 8),
-            Text(
-              state.detail.statusName,
-              style: textTheme.titleSmall?.copyWith(
-                color: scheme.error,
-                fontWeight: FontWeight.w600,
+            Expanded(
+              child: Text(
+                state.detail.statusName,
+                style: textTheme.titleSmall?.copyWith(
+                  color: scheme.error,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
@@ -548,9 +553,16 @@ class _TotalsCard extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 3),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: style),
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: style,
+              ),
+            ),
+            const SizedBox(width: 8),
             Text('\$${value.toStringAsFixed(2)}', style: style),
           ],
         ),
@@ -695,10 +707,12 @@ class _HistorySection extends StatelessWidget {
           children: [
             Icon(Icons.history, size: 20, color: scheme.secondary),
             const SizedBox(width: 8),
-            Text(
-              l10n.historySection,
-              style: textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
+            Expanded(
+              child: Text(
+                l10n.historySection,
+                style: textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],

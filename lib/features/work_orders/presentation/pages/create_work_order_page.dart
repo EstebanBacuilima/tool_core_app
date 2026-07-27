@@ -112,14 +112,17 @@ class _CreateOrderViewState extends State<_CreateOrderView> {
           body: SafeArea(
             child: Column(
               children: [
-                _StepIndicator(
-                  step: _step,
-                  labels: [
-                    l10n.stepVehicle,
-                    l10n.stepReception,
-                    l10n.stepConfirm,
-                  ],
-                ),
+                // Hidden while the keyboard is open: in landscape the fixed
+                // indicator + bottom bar would not fit the remaining height.
+                if (MediaQuery.of(context).viewInsets.bottom == 0)
+                  _StepIndicator(
+                    step: _step,
+                    labels: [
+                      l10n.stepVehicle,
+                      l10n.stepReception,
+                      l10n.stepConfirm,
+                    ],
+                  ),
                 Expanded(
                   child: switch (_step) {
                     0 => _VehicleStep(
@@ -209,13 +212,18 @@ class _StepIndicator extends StatelessWidget {
                         ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  labels[i],
-                  style: textTheme.labelSmall?.copyWith(
-                    color: i == step
-                        ? scheme.primary
-                        : scheme.onSurface.withValues(alpha: 0.6),
-                    fontWeight: i == step ? FontWeight.w600 : null,
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 96),
+                  child: Text(
+                    labels[i],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.labelSmall?.copyWith(
+                      color: i == step
+                          ? scheme.primary
+                          : scheme.onSurface.withValues(alpha: 0.6),
+                      fontWeight: i == step ? FontWeight.w600 : null,
+                    ),
                   ),
                 ),
               ],
@@ -555,9 +563,13 @@ class _SummaryStep extends StatelessWidget {
         children: [
           Icon(icon, size: 20, color: scheme.secondary),
           const SizedBox(width: 10),
-          Text(
-            '$label: ',
-            style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+          Flexible(
+            child: Text(
+              '$label: ',
+              style: textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
           Expanded(child: Text(value, style: textTheme.bodyMedium)),
         ],
@@ -655,19 +667,37 @@ class _BottomBar extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       child: Row(
         children: [
-          if (step > 0)
-            OutlinedButton(
-              onPressed: saving ? null : onBack,
-              child: Text(l10n.back),
+          Expanded(
+            child: Row(
+              children: [
+                if (step > 0)
+                  Flexible(
+                    child: OutlinedButton(
+                      onPressed: saving ? null : onBack,
+                      child: Text(
+                        l10n.back,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                if (step == 1) ...[
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: TextButton(
+                      onPressed: saving ? null : onSkip,
+                      child: Text(
+                        l10n.skipStep,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
-          if (step == 1) ...[
-            const SizedBox(width: 8),
-            TextButton(
-              onPressed: saving ? null : onSkip,
-              child: Text(l10n.skipStep),
-            ),
-          ],
-          const Spacer(),
+          ),
+          const SizedBox(width: 8),
           FilledButton(
             onPressed: switch (step) {
               0 => state.vehicle != null ? onNext : null,
@@ -675,7 +705,8 @@ class _BottomBar extends StatelessWidget {
               _ => state.canSubmit ? onSubmit : null,
             },
             style: FilledButton.styleFrom(
-              minimumSize: const Size(140, 48),
+              minimumSize: const Size(0, 48),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
               ),
@@ -686,7 +717,7 @@ class _BottomBar extends StatelessWidget {
                     width: 22,
                     child: CircularProgressIndicator(strokeWidth: 2.5),
                   )
-                : Text(step == 2 ? l10n.createOrder : l10n.next),
+                : Text(step == 2 ? l10n.createOrder : l10n.next, maxLines: 1),
           ),
         ],
       ),

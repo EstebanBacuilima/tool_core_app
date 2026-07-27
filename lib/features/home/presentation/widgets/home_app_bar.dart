@@ -5,10 +5,12 @@ import '../../../../core/theme/theme_cubit.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const HomeAppBar({super.key});
+  final double height;
+
+  const HomeAppBar({super.key, this.height = 88});
 
   @override
-  Size get preferredSize => const Size.fromHeight(88);
+  Size get preferredSize => Size.fromHeight(height);
 
   String _initials(String? name) {
     if (name == null || name.trim().isEmpty) return '';
