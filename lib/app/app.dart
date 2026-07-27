@@ -45,7 +45,7 @@ class _ToolCoreAppState extends State<ToolCoreApp> {
             // Same brand seed in both modes; themeMode decides which one
             // is active (system follows the device).
             theme: themeState.brand.toLightTheme(),
-            darkTheme: themeState.brand.toLightTheme(),
+            darkTheme: themeState.brand.toDarkTheme(),
             themeMode: themeState.mode,
             // Use device language by default
             locale: null,

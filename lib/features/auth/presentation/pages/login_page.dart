@@ -56,7 +56,6 @@ class _LoginViewState extends State<_LoginView> {
       (cubit) => cubit.state is LoginLoading,
     );
     final textTheme = Theme.of(context).textTheme;
-    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: BlocListener<LoginCubit, LoginState>(
@@ -77,15 +76,12 @@ class _LoginViewState extends State<_LoginView> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: scheme.secondary.withValues(alpha: 0.12),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.build_circle_outlined,
-                      size: 56
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      width: 96,
+                      height: 96,
                     ),
                   ),
                   const SizedBox(height: 16),

@@ -40,20 +40,20 @@ class BrandTheme extends Equatable {
   /// the mirror of light). Only `error` keeps a hue, for error semantics.
   static const BrandTheme fallback = BrandTheme(
     light: BrandPalette(
-      primary: Color(0xFF141414),
-      secondary: Color(0xFF3D3D3D),
-      accent: Color(0xFF525252),
-      text: Color(0xFF000000),
-      background: Color(0xFFF5F5F5),
+      primary: Color(0xFF0C2340),
+      secondary: Color(0xFF1E3A5F),
+      accent: Color(0xFFF7B61B),
+      text: Color(0xFF0F172A),
+      background: Color(0xFFF4F6F8),
       surface: Color(0xFFFFFFFF),
     ),
     dark: BrandPalette(
-      primary: Color(0xFFFAFAFA),
-      secondary: Color(0xFFA3A3A3),
-      accent: Color(0xFFD4D4D4),
-      text: Color(0xFFF5F5F5),
-      background: Color(0xFF0A0A0A),
-      surface: Color(0xFF171717),
+      primary: Color(0xFF1E3A5F),
+      secondary: Color(0xFF0C2340),
+      accent: Color(0xFFF7B61B),
+      text: Color(0xFFF8FAFC),
+      background: Color(0xFF071220),
+      surface: Color(0xFF0C2340),
     ),
   );
 

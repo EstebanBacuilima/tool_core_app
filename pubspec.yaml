@@ -40,3 +40,5 @@ flutter:
   uses-material-design: true
   # Enables gen-l10n: localizations are generated from lib/l10n/*.arb (see l10n.yaml).
   generate: true
+  assets:
+    - assets/images/

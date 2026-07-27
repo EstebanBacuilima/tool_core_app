@@ -100,16 +100,12 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                               1 + 0.04 * math.sin(_loop.value * 2 * math.pi);
                           return Transform.scale(scale: pulse, child: child);
                         },
-                        child: Container(
-                          padding: const EdgeInsets.all(22),
-                          decoration: BoxDecoration(
-                            color: scheme.onPrimary.withValues(alpha: 0.14),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.build_circle_outlined,
-                            size: 64,
-                            color: scheme.onPrimary,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(28),
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            width: 104,
+                            height: 104,
                           ),
                         ),
                       ),

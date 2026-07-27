@@ -83,8 +83,8 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ],
                 ),
               ),
-              // const SizedBox(width: 8),
-              // const _ThemeToggleButton(),
+              const SizedBox(width: 8),
+              Visibility(visible: false, child: const _ThemeToggleButton()),
               const SizedBox(width: 8),
               _CircleAction(
                 tooltip: l10n.logout,
