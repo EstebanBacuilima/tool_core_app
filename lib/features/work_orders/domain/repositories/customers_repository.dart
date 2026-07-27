@@ -7,6 +7,9 @@ abstract class CustomersRepository {
   /// `GET /customers?search=` — paginated.
   Future<PagedResult<Customer>> search(String query, {int page = 1});
 
+  /// `GET /vehicles?search=` — paginated; matches plate or owner data.
+  Future<PagedResult<Vehicle>> searchVehicles(String query, {int page = 1});
+
   /// `GET /customers/{customerCode}/vehicles`
   Future<List<Vehicle>> getVehicles(String customerCode);
 

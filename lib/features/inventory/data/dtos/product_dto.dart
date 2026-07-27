@@ -10,6 +10,7 @@ class ProductDto {
   final String? unit;
   final double costPrice;
   final double salePrice;
+  final double salePriceWithTax;
   final bool isTaxable;
   final bool isActive;
   final String categoryCode;
@@ -25,6 +26,7 @@ class ProductDto {
     this.unit,
     required this.costPrice,
     required this.salePrice,
+    required this.salePriceWithTax,
     required this.isTaxable,
     required this.isActive,
     required this.categoryCode,
@@ -33,6 +35,7 @@ class ProductDto {
   });
 
   factory ProductDto.fromJson(Map<String, dynamic> json) {
+    final salePrice = (json['salePrice'] as num? ?? 0).toDouble();
     return ProductDto(
       code: json['code'] as String? ?? '',
       name: json['name'] as String? ?? '',
@@ -41,7 +44,9 @@ class ProductDto {
       barcode: json['barcode'] as String?,
       unit: json['unit'] as String?,
       costPrice: (json['costPrice'] as num? ?? 0).toDouble(),
-      salePrice: (json['salePrice'] as num? ?? 0).toDouble(),
+      salePrice: salePrice,
+      salePriceWithTax:
+          (json['salePriceWithTax'] as num?)?.toDouble() ?? salePrice,
       isTaxable: json['isTaxable'] as bool? ?? true,
       isActive: json['isActive'] as bool? ?? true,
       categoryCode: json['categoryCode'] as String? ?? '',
@@ -59,6 +64,7 @@ class ProductDto {
         unit: unit,
         costPrice: costPrice,
         salePrice: salePrice,
+        salePriceWithTax: salePriceWithTax,
         isTaxable: isTaxable,
         isActive: isActive,
         categoryCode: categoryCode,

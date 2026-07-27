@@ -1,11 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:tool_core_app/l10n/app_localizations.dart';
 
 import '../../../../core/errors/error_localizer.dart';
+import '../../../../shared/domain/entities/customer.dart';
 import '../cubit/create_order_cubit.dart';
 import '../cubit/create_order_state.dart';
+
+const _identificationExistsCode = 'identification-already-exists';
 
 Future<bool?> showCustomerQuickSheet(
   BuildContext context,
@@ -41,8 +46,12 @@ class _CustomerQuickSheetState extends State<_CustomerQuickSheet> {
 
   String? _errorCode;
 
+  Customer? _existingCustomer;
+  Timer? _dedupDebounce;
+
   @override
   void dispose() {
+    _dedupDebounce?.cancel();
     _firstNameController.dispose();
     _lastNameController.dispose();
     _identificationController.dispose();
@@ -53,6 +62,28 @@ class _CustomerQuickSheetState extends State<_CustomerQuickSheet> {
   String? _nullable(TextEditingController controller) {
     final value = controller.text.trim();
     return value.isEmpty ? null : value;
+  }
+
+  void _onIdentificationChanged(String value) {
+    _dedupDebounce?.cancel();
+    if (_existingCustomer != null) setState(() => _existingCustomer = null);
+    final identification = value.trim();
+    if (identification.isEmpty || identification.length < 10) return;
+    _dedupDebounce = Timer(const Duration(milliseconds: 450), () async {
+      final existing = await context
+          .read<CreateOrderCubit>()
+          .findCustomerByIdentification(identification);
+      var textController = _identificationController.text.trim();
+      if (!mounted || textController != identification) {
+        return;
+      }
+      setState(() => _existingCustomer = existing);
+    });
+  }
+
+  void _useExistingCustomer(Customer customer) {
+    context.read<CreateOrderCubit>().selectCustomer(customer);
+    Navigator.of(context).pop(false);
   }
 
   Future<void> _onSubmit() async {
@@ -70,11 +101,24 @@ class _CustomerQuickSheetState extends State<_CustomerQuickSheet> {
       phone: _nullable(_phoneController),
     );
     if (!mounted) return;
+    if (created) {
+      setState(() => _saving = false);
+      Navigator.of(context).pop(true);
+      return;
+    }
+    final errorCode = cubit.state.errorCode;
+    Customer? existing;
+    if (errorCode == _identificationExistsCode) {
+      existing = await cubit.findCustomerByIdentification(
+        _identificationController.text.trim(),
+      );
+      if (!mounted) return;
+    }
     setState(() {
       _saving = false;
-      _errorCode = created ? null : cubit.state.errorCode;
+      _existingCustomer = existing;
+      _errorCode = existing == null ? errorCode : null;
     });
-    if (created) Navigator.of(context).pop(true);
   }
 
   @override
@@ -115,9 +159,21 @@ class _CustomerQuickSheetState extends State<_CustomerQuickSheet> {
             ),
             const SizedBox(height: 20),
             TextFormField(
-              controller: _firstNameController,
+              controller: _identificationController,
               enabled: !_saving,
               autofocus: true,
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.number,
+              onChanged: _onIdentificationChanged,
+              decoration: InputDecoration(
+                labelText: l10n.customerIdentification,
+                prefixIcon: const Icon(Icons.numbers_outlined),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _firstNameController,
+              enabled: !_saving,
               textInputAction: TextInputAction.next,
               textCapitalization: TextCapitalization.words,
               decoration: InputDecoration(
@@ -140,8 +196,6 @@ class _CustomerQuickSheetState extends State<_CustomerQuickSheet> {
               ),
             ),
             const SizedBox(height: 16),
-            // The backend requires the document type whenever an
-            // identification number is sent.
             BlocBuilder<CreateOrderCubit, CreateOrderState>(
               buildWhen: (previous, current) =>
                   previous.documentTypes != current.documentTypes,
@@ -169,17 +223,62 @@ class _CustomerQuickSheetState extends State<_CustomerQuickSheet> {
                     : null,
               ),
             ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _identificationController,
-              enabled: !_saving,
-              textInputAction: TextInputAction.next,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: l10n.customerIdentification,
-                prefixIcon: const Icon(Icons.numbers_outlined),
+            if (_existingCustomer != null) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: scheme.tertiary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: scheme.tertiary.withValues(alpha: 0.4),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          size: 20,
+                          color: scheme.tertiary,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            l10n.customerAlreadyExists,
+                            style: textTheme.bodySmall,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _existingCustomer!.fullName,
+                      style: textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (_existingCustomer!.phone != null)
+                      Text(
+                        _existingCustomer!.phone!,
+                        style: textTheme.bodySmall,
+                      ),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: FilledButton.tonalIcon(
+                        onPressed: () =>
+                            _useExistingCustomer(_existingCustomer!),
+                        icon: const Icon(Icons.person_search_outlined),
+                        label: Text(l10n.useThisCustomer),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
             const SizedBox(height: 16),
             TextFormField(
               controller: _phoneController,
@@ -217,7 +316,9 @@ class _CustomerQuickSheetState extends State<_CustomerQuickSheet> {
             ],
             const SizedBox(height: 24),
             FilledButton(
-              onPressed: _saving ? null : _onSubmit,
+              onPressed: (_saving || _existingCustomer != null)
+                  ? null
+                  : _onSubmit,
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(52),
                 shape: RoundedRectangleBorder(

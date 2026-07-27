@@ -11,6 +11,8 @@ class Product extends Equatable {
   final String? unit;
   final double costPrice;
   final double salePrice;
+  final double salePriceWithTax;
+
   final bool isTaxable;
   final bool isActive;
   final String categoryCode;
@@ -26,6 +28,7 @@ class Product extends Equatable {
     this.unit,
     required this.costPrice,
     required this.salePrice,
+    required this.salePriceWithTax,
     required this.isTaxable,
     required this.isActive,
     required this.categoryCode,
@@ -43,6 +46,7 @@ class Product extends Equatable {
         unit,
         costPrice,
         salePrice,
+        salePriceWithTax,
         isTaxable,
         isActive,
         categoryCode,

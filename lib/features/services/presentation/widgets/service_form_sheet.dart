@@ -46,7 +46,7 @@ class _ServiceFormSheetState extends State<_ServiceFormSheet> {
     super.initState();
     _nameController = TextEditingController(text: widget.service?.name);
     _priceController = TextEditingController(
-      text: widget.service?.price.toStringAsFixed(2),
+      text: widget.service?.priceWithTax.toStringAsFixed(2),
     );
     _descriptionController = TextEditingController(
       text: widget.service?.description,
@@ -154,6 +154,7 @@ class _ServiceFormSheetState extends State<_ServiceFormSheet> {
                   ),
                   decoration: InputDecoration(
                     labelText: l10n.servicePrice,
+                    helperText: l10n.priceWithTaxHelper,
                     prefixIcon: const Icon(Icons.attach_money_outlined),
                   ),
                   validator: (value) {

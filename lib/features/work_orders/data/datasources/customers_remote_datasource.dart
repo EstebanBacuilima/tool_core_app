@@ -28,6 +28,23 @@ class CustomersRemoteDatasource {
     return ApiPagedResponse.fromJson(response.data!, CustomerDto.fromJson);
   }
 
+  Future<ApiPagedResponse<VehicleDto>> searchVehicles(
+    String query, {
+    int page = 1,
+    int pageSize = 20,
+  }) async {
+    final response = await _dio.get<Map<String, dynamic>>(
+      '/vehicles',
+      queryParameters: {
+        if (query.isNotEmpty) 'search': query,
+        'page': page,
+        'page-size': pageSize,
+      },
+    );
+
+    return ApiPagedResponse.fromJson(response.data!, VehicleDto.fromJson);
+  }
+
   Future<List<VehicleDto>> getVehicles(String customerCode) async {
     final response = await _dio.get<Map<String, dynamic>>(
       '/customers/$customerCode/vehicles',

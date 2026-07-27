@@ -81,7 +81,7 @@ class _ProductFormSheetState extends State<_ProductFormSheet> {
     final p = widget.product;
     _nameController = TextEditingController(text: p?.name);
     _salePriceController =
-        TextEditingController(text: p?.salePrice.toStringAsFixed(2));
+        TextEditingController(text: p?.salePriceWithTax.toStringAsFixed(2));
     _costPriceController =
         TextEditingController(text: p?.costPrice.toStringAsFixed(2));
     _brandController = TextEditingController(text: p?.brand);
@@ -242,6 +242,10 @@ class _ProductFormSheetState extends State<_ProductFormSheet> {
                           ),
                           decoration: InputDecoration(
                             labelText: l10n.salePrice,
+                            helperText: _isTaxable
+                                ? l10n.priceWithTaxHelper
+                                : l10n.priceZeroRatedHelper,
+                            helperMaxLines: 2,
                             prefixIcon: const Icon(Icons.attach_money_outlined),
                           ),
                           validator: (v) => _priceValidator(v, l10n),
@@ -258,6 +262,8 @@ class _ProductFormSheetState extends State<_ProductFormSheet> {
                           ),
                           decoration: InputDecoration(
                             labelText: l10n.costPrice,
+                            helperText: l10n.costPriceHelper,
+                            helperMaxLines: 2,
                             prefixIcon:
                                 const Icon(Icons.shopping_cart_outlined),
                           ),
@@ -343,6 +349,14 @@ class _ProductFormSheetState extends State<_ProductFormSheet> {
                         : (value) => setState(() => _isTaxable = value),
                     contentPadding: EdgeInsets.zero,
                     title: Text(l10n.taxable, style: textTheme.bodyLarge),
+                    subtitle: Text(
+                      _isTaxable
+                          ? l10n.taxableSubtitle
+                          : l10n.zeroRatedSubtitle,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   FilledButton(

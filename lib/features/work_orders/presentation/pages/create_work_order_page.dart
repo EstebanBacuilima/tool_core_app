@@ -20,7 +20,7 @@ class CreateWorkOrderPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => getIt<CreateOrderCubit>()
-        ..searchCustomers('')
+        ..searchVehicles('')
         ..loadDocumentTypes(),
       child: const _CreateOrderView(),
     );
@@ -38,7 +38,8 @@ class _CreateOrderViewState extends State<_CreateOrderView> {
   static const _fuelLevels = ['Vacío', '1/4', '1/2', '3/4', 'Lleno'];
 
   int _step = 0;
-  final _searchController = TextEditingController();
+
+  final _vehicleSearchController = TextEditingController();
   final _mileageController = TextEditingController();
   final _complaintController = TextEditingController();
   String? _fuelLevel;
@@ -47,17 +48,32 @@ class _CreateOrderViewState extends State<_CreateOrderView> {
   @override
   void dispose() {
     _debounce?.cancel();
-    _searchController.dispose();
+    _vehicleSearchController.dispose();
     _mileageController.dispose();
     _complaintController.dispose();
     super.dispose();
   }
 
-  void _onSearchChanged(String query) {
+  void _onVehicleSearchChanged(String query) {
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 450), () {
-      if (mounted) context.read<CreateOrderCubit>().searchCustomers(query);
+      if (mounted) context.read<CreateOrderCubit>().searchVehicles(query);
     });
+  }
+
+  /// Plate typed in the search, to pre-fill vehicle creation.
+  String get _typedPlate => _vehicleSearchController.text.trim().toUpperCase();
+
+  /// No-results path: create the customer and chain straight into creating
+  /// their vehicle with the searched plate pre-filled. If the sheet resolved
+  /// an EXISTING customer instead (dedup by identification), it pops false
+  /// and the step shows their vehicles rather than jumping to creation.
+  Future<void> _createCustomerAndVehicle() async {
+    final cubit = context.read<CreateOrderCubit>();
+    final createdCustomer = await showCustomerQuickSheet(context, cubit);
+    if (createdCustomer == true && mounted) {
+      await showVehicleQuickSheet(context, cubit, initialPlate: _typedPlate);
+    }
   }
 
   void _submit(BuildContext context) {
@@ -108,8 +124,10 @@ class _CreateOrderViewState extends State<_CreateOrderView> {
                   child: switch (_step) {
                     0 => _VehicleStep(
                       state: state,
-                      searchController: _searchController,
-                      onSearchChanged: _onSearchChanged,
+                      vehicleSearchController: _vehicleSearchController,
+                      onVehicleSearchChanged: _onVehicleSearchChanged,
+                      typedPlate: _typedPlate,
+                      onCreateCustomerAndVehicle: _createCustomerAndVehicle,
                     ),
                     1 => _ReceptionStep(
                       mileageController: _mileageController,
@@ -209,17 +227,22 @@ class _StepIndicator extends StatelessWidget {
   }
 }
 
-/// Step 1: pick the vehicle (customer search -> vehicle), with quick
-/// creation of both.
+/// Step 1: pick the vehicle. Plate-first: search vehicles directly (plate or
+/// owner data); fallback is creating customer+vehicle — the customer sheet
+/// dedups by identification and can resolve an existing customer instead.
 class _VehicleStep extends StatelessWidget {
   final CreateOrderState state;
-  final TextEditingController searchController;
-  final ValueChanged<String> onSearchChanged;
+  final TextEditingController vehicleSearchController;
+  final ValueChanged<String> onVehicleSearchChanged;
+  final String typedPlate;
+  final VoidCallback onCreateCustomerAndVehicle;
 
   const _VehicleStep({
     required this.state,
-    required this.searchController,
-    required this.onSearchChanged,
+    required this.vehicleSearchController,
+    required this.onVehicleSearchChanged,
+    required this.typedPlate,
+    required this.onCreateCustomerAndVehicle,
   });
 
   @override
@@ -229,50 +252,109 @@ class _VehicleStep extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final cubit = context.read<CreateOrderCubit>();
     final customer = state.customer;
+    final selected = state.vehicle;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       children: [
-        if (customer == null) ...[
+        if (customer == null && selected != null) ...[
+          // Vehicle picked straight from the plate search.
+          Card(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+              side: BorderSide(color: scheme.primary, width: 2),
+            ),
+            child: ListTile(
+              leading: Icon(
+                Icons.directions_car_outlined,
+                color: scheme.secondary,
+              ),
+              title: Text(selected.plate),
+              subtitle: Text(
+                '${selected.brand} ${selected.model}'
+                '${selected.year != null ? ' • ${selected.year}' : ''}'
+                '${selected.customerName != null ? '\n${selected.customerName}' : ''}',
+              ),
+              isThreeLine: selected.customerName != null,
+              trailing: TextButton(
+                onPressed: cubit.clearVehicleSelection,
+                child: Text(l10n.change),
+              ),
+            ),
+          ),
+        ] else if (customer == null) ...[
+          // Plate-first search (also matches the owner's name/ID).
           TextField(
-            controller: searchController,
-            onChanged: onSearchChanged,
+            controller: vehicleSearchController,
+            onChanged: onVehicleSearchChanged,
             textInputAction: TextInputAction.search,
+            textCapitalization: TextCapitalization.characters,
             decoration: InputDecoration(
-              hintText: l10n.searchCustomers,
+              hintText: l10n.searchVehiclesHint,
               prefixIcon: const Icon(Icons.search),
               isDense: true,
             ),
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(
-            onPressed: () => showCustomerQuickSheet(context, cubit),
+            onPressed: onCreateCustomerAndVehicle,
             icon: const Icon(Icons.person_add_outlined),
-            label: Text(l10n.customerNew),
+            label: Text(
+              l10n.createCustomerAndVehicle,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
           const SizedBox(height: 8),
-          if (state.searching)
+          if (state.searchingVehicles)
             const Padding(
               padding: EdgeInsets.all(24),
               child: Center(child: CircularProgressIndicator()),
             )
+          else if (state.vehicleResults.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.no_crash_outlined,
+                    size: 48,
+                    color: scheme.onSurface.withValues(alpha: 0.3),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.noVehiclesFound,
+                    textAlign: TextAlign.center,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: scheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
+                ],
+              ),
+            )
           else ...[
-            for (final result in state.customers)
+            for (final vehicle in state.vehicleResults)
               ListTile(
                 leading: CircleAvatar(
                   backgroundColor: scheme.secondary.withValues(alpha: 0.12),
-                  child: Icon(Icons.person_outline, color: scheme.secondary),
+                  child: Icon(
+                    Icons.directions_car_outlined,
+                    color: scheme.secondary,
+                  ),
                 ),
-                title: Text(result.fullName),
-                subtitle: result.identificationNumber != null
-                    ? Text(result.identificationNumber!)
-                    : null,
-                onTap: () => cubit.selectCustomer(result),
+                title: Text(vehicle.plate),
+                subtitle: Text(
+                  '${vehicle.brand} ${vehicle.model}'
+                  '${vehicle.year != null ? ' • ${vehicle.year}' : ''}'
+                  '${vehicle.customerName != null ? '\n${vehicle.customerName}' : ''}',
+                ),
+                isThreeLine: vehicle.customerName != null,
+                onTap: () => cubit.selectVehicleResult(vehicle),
               ),
             // Paginated search: offer the next page explicitly.
-            if (state.customersHasMore)
+            if (state.vehiclesHasMore)
               Center(
-                child: state.loadingMoreCustomers
+                child: state.loadingMoreVehicles
                     ? const Padding(
                         padding: EdgeInsets.all(8),
                         child: SizedBox(
@@ -282,7 +364,7 @@ class _VehicleStep extends StatelessWidget {
                         ),
                       )
                     : TextButton.icon(
-                        onPressed: cubit.loadMoreCustomers,
+                        onPressed: cubit.loadMoreVehicles,
                         icon: const Icon(Icons.expand_more),
                         label: Text(l10n.loadMore),
                       ),
@@ -367,7 +449,8 @@ class _VehicleStep extends StatelessWidget {
               ),
           const SizedBox(height: 4),
           OutlinedButton.icon(
-            onPressed: () => showVehicleQuickSheet(context, cubit),
+            onPressed: () =>
+                showVehicleQuickSheet(context, cubit, initialPlate: typedPlate),
             icon: const Icon(Icons.add),
             label: Text(l10n.vehicleNew),
           ),
@@ -500,7 +583,8 @@ class _SummaryStep extends StatelessWidget {
                 row(
                   Icons.person_outline,
                   l10n.summaryCustomer,
-                  state.customer?.fullName ?? '—',
+                  // Plate-first picks carry the owner on the vehicle itself.
+                  state.customer?.fullName ?? vehicle?.customerName ?? '—',
                 ),
                 row(
                   Icons.directions_car_outlined,

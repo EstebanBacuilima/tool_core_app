@@ -161,7 +161,7 @@ class _AddProductLineSheetState extends State<_AddProductLineSheet> {
                             ),
                             title: Text(product.name),
                             subtitle: Text(
-                              '\$${product.salePrice.toStringAsFixed(2)}'
+                              '\$${product.salePriceWithTax.toStringAsFixed(2)}'
                               ' • ${l10n.stockLabel}: '
                               '${product.stock?.toStringAsFixed(0) ?? '0'}',
                             ),

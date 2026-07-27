@@ -43,6 +43,8 @@ String localizeErrorCode(AppLocalizations l10n, String code) {
       return l10n.errorDocumentTypeRequired;
     case 'customer-not-found':
       return l10n.errorCustomerNotFound;
+    case 'identification-already-exists':
+      return l10n.errorIdentificationExists;
     case 'customer-first-name-required':
       return l10n.errorCustomerFirstNameRequired;
     case 'customer-required':

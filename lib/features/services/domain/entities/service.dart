@@ -5,6 +5,8 @@ class Service extends Equatable {
   final String code;
   final String name;
   final double price;
+  final double priceWithTax;
+
   final String? description;
   final bool isActive;
 
@@ -12,10 +14,18 @@ class Service extends Equatable {
     required this.code,
     required this.name,
     required this.price,
+    required this.priceWithTax,
     this.description,
     required this.isActive,
   });
 
   @override
-  List<Object?> get props => [code, name, price, description, isActive];
+  List<Object?> get props => [
+    code,
+    name,
+    price,
+    priceWithTax,
+    description,
+    isActive,
+  ];
 }

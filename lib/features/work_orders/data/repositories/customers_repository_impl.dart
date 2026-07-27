@@ -29,6 +29,24 @@ class CustomersRepositoryImpl implements CustomersRepository {
   }
 
   @override
+  Future<PagedResult<Vehicle>> searchVehicles(
+    String query, {
+    int page = 1,
+  }) async {
+    try {
+      final response = await _remote.searchVehicles(query, page: page);
+      return PagedResult(
+        items: response.data.map((d) => d.toEntity()).toList(),
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        totalCount: response.totalCount,
+      );
+    } on DioException catch (e) {
+      throw ErrorMapper.fromDio(e);
+    }
+  }
+
+  @override
   Future<List<Vehicle>> getVehicles(String customerCode) async {
     try {
       final dtos = await _remote.getVehicles(customerCode);

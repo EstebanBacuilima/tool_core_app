@@ -190,7 +190,7 @@ class _ServiceTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '\$${service.price.toStringAsFixed(2)}',
+                    '\$${service.priceWithTax.toStringAsFixed(2)}',
                     style: textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),

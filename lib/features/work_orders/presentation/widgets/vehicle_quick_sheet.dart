@@ -6,12 +6,11 @@ import 'package:tool_core_app/l10n/app_localizations.dart';
 import '../../../../core/errors/error_localizer.dart';
 import '../cubit/create_order_cubit.dart';
 
-/// Quick vehicle creation for the selected customer. The created vehicle
-/// is selected automatically. Returns true when created.
 Future<bool?> showVehicleQuickSheet(
   BuildContext context,
-  CreateOrderCubit cubit,
-) {
+  CreateOrderCubit cubit, {
+  String? initialPlate,
+}) {
   return showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
@@ -21,13 +20,15 @@ Future<bool?> showVehicleQuickSheet(
     ),
     builder: (_) => BlocProvider.value(
       value: cubit,
-      child: const _VehicleQuickSheet(),
+      child: _VehicleQuickSheet(initialPlate: initialPlate),
     ),
   );
 }
 
 class _VehicleQuickSheet extends StatefulWidget {
-  const _VehicleQuickSheet();
+  final String? initialPlate;
+
+  const _VehicleQuickSheet({this.initialPlate});
 
   @override
   State<_VehicleQuickSheet> createState() => _VehicleQuickSheetState();
@@ -46,6 +47,15 @@ class _VehicleQuickSheetState extends State<_VehicleQuickSheet> {
   /// Backend error shown INSIDE the sheet (a page-level snackbar would
   /// be hidden behind the modal).
   String? _errorCode;
+
+  @override
+  void initState() {
+    super.initState();
+    final initialPlate = widget.initialPlate?.trim();
+    if (initialPlate != null && initialPlate.isNotEmpty) {
+      _plateController.text = initialPlate.toUpperCase();
+    }
+  }
 
   @override
   void dispose() {

@@ -32,7 +32,7 @@ class ServicesCubit extends Cubit<ServicesState> {
       final updated = await _repository.update(
         code: service.code,
         name: service.name,
-        price: service.price,
+        price: service.priceWithTax,
         description: service.description,
         isActive: isActive,
       );

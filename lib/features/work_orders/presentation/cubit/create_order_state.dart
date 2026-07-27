@@ -7,11 +7,10 @@ import '../../../../shared/domain/entities/vehicle.dart';
 enum CreateOrderStatus { idle, saving, success }
 
 class CreateOrderState extends Equatable {
-  /// Customer search results (step 1), server-paginated.
-  final List<Customer> customers;
-  final bool searching;
-  final bool customersHasMore;
-  final bool loadingMoreCustomers;
+  final List<Vehicle> vehicleResults;
+  final bool searchingVehicles;
+  final bool vehiclesHasMore;
+  final bool loadingMoreVehicles;
 
   /// Catalog for the quick-create customer sheet.
   final List<DocumentType> documentTypes;
@@ -30,10 +29,10 @@ class CreateOrderState extends Equatable {
   final String? errorCode;
 
   const CreateOrderState({
-    this.customers = const [],
-    this.searching = false,
-    this.customersHasMore = false,
-    this.loadingMoreCustomers = false,
+    this.vehicleResults = const [],
+    this.searchingVehicles = false,
+    this.vehiclesHasMore = false,
+    this.loadingMoreVehicles = false,
     this.documentTypes = const [],
     this.customer,
     this.vehicles = const [],
@@ -47,10 +46,10 @@ class CreateOrderState extends Equatable {
   bool get canSubmit => vehicle != null && status != CreateOrderStatus.saving;
 
   CreateOrderState copyWith({
-    List<Customer>? customers,
-    bool? searching,
-    bool? customersHasMore,
-    bool? loadingMoreCustomers,
+    List<Vehicle>? vehicleResults,
+    bool? searchingVehicles,
+    bool? vehiclesHasMore,
+    bool? loadingMoreVehicles,
     List<DocumentType>? documentTypes,
     Customer? customer,
     bool clearCustomer = false,
@@ -63,10 +62,10 @@ class CreateOrderState extends Equatable {
     String? errorCode,
   }) {
     return CreateOrderState(
-      customers: customers ?? this.customers,
-      searching: searching ?? this.searching,
-      customersHasMore: customersHasMore ?? this.customersHasMore,
-      loadingMoreCustomers: loadingMoreCustomers ?? this.loadingMoreCustomers,
+      vehicleResults: vehicleResults ?? this.vehicleResults,
+      searchingVehicles: searchingVehicles ?? this.searchingVehicles,
+      vehiclesHasMore: vehiclesHasMore ?? this.vehiclesHasMore,
+      loadingMoreVehicles: loadingMoreVehicles ?? this.loadingMoreVehicles,
       documentTypes: documentTypes ?? this.documentTypes,
       customer: clearCustomer ? null : (customer ?? this.customer),
       vehicles: vehicles ?? this.vehicles,
@@ -81,10 +80,10 @@ class CreateOrderState extends Equatable {
 
   @override
   List<Object?> get props => [
-    customers,
-    searching,
-    customersHasMore,
-    loadingMoreCustomers,
+    vehicleResults,
+    searchingVehicles,
+    vehiclesHasMore,
+    loadingMoreVehicles,
     documentTypes,
     customer,
     vehicles,

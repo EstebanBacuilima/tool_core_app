@@ -168,7 +168,7 @@ class _AddLaborLineSheetState extends State<_AddLaborLineSheet> {
                             value: service.code,
                             child: Text(
                               '${service.name} '
-                              '(\$${service.price.toStringAsFixed(2)})',
+                              '(\$${service.priceWithTax.toStringAsFixed(2)})',
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -230,6 +230,7 @@ class _AddLaborLineSheetState extends State<_AddLaborLineSheet> {
               ),
               decoration: InputDecoration(
                 labelText: l10n.laborUnitPrice,
+                helperText: l10n.priceWithTaxHelper,
                 prefixIcon: const Icon(Icons.attach_money_outlined),
               ),
             ),

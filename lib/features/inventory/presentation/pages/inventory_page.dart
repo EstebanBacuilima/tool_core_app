@@ -389,7 +389,7 @@ class _ProductTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '\$${product.salePrice.toStringAsFixed(2)}',
+                    '\$${product.salePriceWithTax.toStringAsFixed(2)}',
                     style: textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),

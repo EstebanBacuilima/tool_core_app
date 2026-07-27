@@ -25,46 +25,74 @@ class CreateOrderCubit extends Cubit<CreateOrderState> {
     }
   }
 
-  String _customersQuery = '';
-  int _customersPage = 1;
+  String _vehiclesQuery = '';
+  int _vehiclesPage = 1;
 
-  Future<void> searchCustomers(String query) async {
-    _customersQuery = query;
-    _customersPage = 1;
-    emit(state.copyWith(searching: true));
+  Future<void> searchVehicles(String query) async {
+    _vehiclesQuery = query;
+    _vehiclesPage = 1;
+    emit(state.copyWith(searchingVehicles: true));
     try {
-      final result = await _customersRepository.search(query);
+      final result = await _customersRepository.searchVehicles(query);
       emit(
         state.copyWith(
-          customers: result.items,
-          customersHasMore: result.hasNext,
-          searching: false,
+          vehicleResults: result.items,
+          vehiclesHasMore: result.hasNext,
+          searchingVehicles: false,
         ),
       );
     } on ApiException catch (e) {
-      emit(state.copyWith(searching: false, errorCode: e.code));
+      emit(state.copyWith(searchingVehicles: false, errorCode: e.code));
     }
   }
 
-  Future<void> loadMoreCustomers() async {
-    if (!state.customersHasMore || state.loadingMoreCustomers) return;
-    emit(state.copyWith(loadingMoreCustomers: true));
+  Future<void> loadMoreVehicles() async {
+    if (!state.vehiclesHasMore || state.loadingMoreVehicles) return;
+    emit(state.copyWith(loadingMoreVehicles: true));
     try {
-      final result = await _customersRepository.search(
-        _customersQuery,
-        page: _customersPage + 1,
+        _vehiclesQuery,
+        page: _vehiclesPage + 1,
       );
-      _customersPage++;
+      _vehiclesPage++;
       emit(
         state.copyWith(
-          customers: [...state.customers, ...result.items],
-          customersHasMore: result.hasNext,
-          loadingMoreCustomers: false,
+          vehicleResults: [...state.vehicleResults, ...result.items],
+          vehiclesHasMore: result.hasNext,
+          loadingMoreVehicles: false,
         ),
       );
     } on ApiException {
-      emit(state.copyWith(loadingMoreCustomers: false));
+      emit(state.copyWith(loadingMoreVehicles: false));
     }
+  }
+
+  void selectVehicleResult(Vehicle vehicle) {
+    emit(
+      state.copyWith(
+        vehicle: vehicle,
+        clearCustomer: true,
+        vehicles: const [],
+      ),
+    );
+  }
+
+  void clearVehicleSelection() {
+    emit(state.copyWith(clearVehicle: true));
+  }
+
+  /// Dedup check for the quick-create sheet: existing customer with exactly
+  /// this identification, if any. Best-effort — on error returns null and
+  /// lets the backend validation catch the duplicate on create.
+  Future<Customer?> findCustomerByIdentification(String identification) async {
+    try {
+      final result = await _customersRepository.search(identification);
+      for (final customer in result.items) {
+        if (customer.identificationNumber == identification) return customer;
+      }
+    } on ApiException {
+      // Ignored: the backend re-validates on POST /customers.
+    }
+    return null;
   }
 
   Future<void> selectCustomer(Customer customer) async {

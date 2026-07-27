@@ -8,7 +8,7 @@ class ApiConstants {
 
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://localhost:5125/api/v1',
+    defaultValue: 'https://tool-core-backend-production.up.railway.app/api/v1',
   );
 
   /// Header used by tenant-scoped endpoints.
